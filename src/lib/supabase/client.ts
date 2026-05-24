@@ -1,20 +1,12 @@
 import { createBrowserClient } from '@supabase/ssr';
 import type { Database } from './database.types';
+import { env } from '@/lib/env';
 
-/**
- * Convenience alias for an authenticated Supabase client typed against our schema.
- *
- * Note: we only pass `Database` and let SupabaseClient default the schema generics.
- * supabase-js v2.106+ has 5 generics — we use defaults to avoid mismatch.
- */
 export type AppSupabaseClient = ReturnType<typeof createBrowserClient<Database>>;
 
-/**
- * Supabase client for the browser (Client Components).
- */
-export function createClient(): AppSupabaseClient {
+export function createClient() {
   return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
 }
