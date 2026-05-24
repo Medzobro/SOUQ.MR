@@ -122,6 +122,7 @@
     "statRating": "avis positifs",
     "directCall": "Appel direct",
     "openingHours": "Horaires",
+    "notFound": "Boutique introuvable",
     "noStore": "Cette boutique n'existe pas",
     "errorLoading": "Impossible de charger la boutique",
     "tryAgain": "Réessayer"

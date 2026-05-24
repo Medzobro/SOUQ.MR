@@ -122,6 +122,7 @@
     "statRating": "تقييم إيجابي",
     "directCall": "اتصال مباشر",
     "openingHours": "أوقات العمل",
+    "notFound": "المتجر غير موجود",
     "noStore": "هذا المتجر غير موجود",
     "errorLoading": "تعذر تحميل المتجر",
     "tryAgain": "إعادة المحاولة"

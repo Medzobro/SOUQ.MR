@@ -122,6 +122,7 @@
     "statRating": "positive reviews",
     "directCall": "Direct call",
     "openingHours": "Opening hours",
+    "notFound": "Store not found",
     "noStore": "Store not found",
     "errorLoading": "Could not load store",
     "tryAgain": "Try again"

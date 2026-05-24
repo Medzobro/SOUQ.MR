@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Cairo, Bebas_Neue } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
@@ -76,6 +76,7 @@ export default async function LocaleLayout({
   const typedLocale = locale as AppLocale;
 
   setRequestLocale(typedLocale);
+  const messages = await getMessages();
 
   return (
     <html
@@ -85,7 +86,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
           <TopNav />
           <main>{children}</main>
           <BottomNav />
