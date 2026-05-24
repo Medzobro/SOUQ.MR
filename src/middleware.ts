@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Skip Next.js internals and static files
-    '/((?!_next|_vercel|.*\\..*|api/).*)',
+    '/((?!_next|_vercel|.*\\.*|api/).*)',
     // Always run for the root
     '/',
   ],
