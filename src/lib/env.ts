@@ -6,20 +6,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z
     .string()
     .url()
-    .default('http://localhost:3000')
-    .transform((url, ctx) => {
-      if (
-        process.env.NODE_ENV === 'production' &&
-        url === 'http://localhost:3000'
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            'NEXT_PUBLIC_SITE_URL should be set to your production URL',
-        });
-      }
-      return url;
-    }),
+    .default('http://localhost:3000'),
   SUPABASE_SERVICE_ROLE_KEY: z
     .string()
     .optional()
@@ -28,7 +15,11 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
+let _env: Env | null = null;
+
 function validateEnv(): Env {
+  if (_env) return _env;
+
   const parsed = envSchema.safeParse({
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -45,7 +36,13 @@ function validateEnv(): Env {
     );
   }
 
-  return parsed.data;
+  _env = parsed.data;
+  return _env;
 }
 
-export const env = validateEnv();
+// Lazy proxy: validates only when a property is accessed (not at import time)
+export const env: Env = new Proxy({} as Env, {
+  get(_target, prop: keyof Env) {
+    return validateEnv()[prop];
+  },
+});
