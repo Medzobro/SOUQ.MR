@@ -17,7 +17,13 @@
     "back": "Back",
     "next": "Next",
     "skip": "Skip",
-    "more": "More"
+    "more": "More",
+    "notFound": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist or has been moved.",
+    "goHome": "Go home",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "An unexpected error occurred. Please try again.",
+    "tryAgain": "Try again"
   },
   "nav": {
     "home": "Home",
@@ -76,7 +82,9 @@
     "errorInvalidCredentials": "Invalid credentials",
     "errorEmailExists": "Email already in use",
     "errorGeneric": "Something went wrong, please try again",
-    "successCheckEmail": "Account created! Check your email to activate."
+    "successCheckEmail": "Account created! Check your email to activate.",
+    "errorTitle": "Authentication error",
+    "tryAgain": "Try again"
   },
   "product": {
     "category": "Category",
@@ -97,7 +105,9 @@
     "conditionUsed": "Used",
     "conditionRefurbished": "Refurbished",
     "negotiable": "Negotiable",
-    "notFound": "Listing not found"
+    "notFound": "Listing not found",
+    "errorLoading": "Could not load product",
+    "tryAgain": "Try again"
   },
   "store": {
     "verified": "✅ Verified",
@@ -112,7 +122,9 @@
     "statRating": "positive reviews",
     "directCall": "Direct call",
     "openingHours": "Opening hours",
-    "noStore": "Store not found"
+    "noStore": "Store not found",
+    "errorLoading": "Could not load store",
+    "tryAgain": "Try again"
   },
   "sell": {
     "title": "Post a listing",
@@ -143,7 +155,8 @@
     "writePlaceholder": "Write a message...",
     "sendButton": "Send",
     "online": "Online",
-    "typing": "typing..."
+    "typing": "typing...",
+    "errorTitle": "Could not load messages"
   },
   "profile": {
     "title": "My account",

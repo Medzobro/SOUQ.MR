@@ -17,7 +17,13 @@
     "back": "رجوع",
     "next": "التالي",
     "skip": "تخطي",
-    "more": "المزيد"
+    "more": "المزيد",
+    "notFound": "الصفحة غير موجودة",
+    "notFoundDescription": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "goHome": "العودة للرئيسية",
+    "errorTitle": "حدث خطأ ما",
+    "errorDescription": "حدث خطأ غير متوقع. الرجاء المحاولة مرة أخرى.",
+    "tryAgain": "إعادة المحاولة"
   },
   "nav": {
     "home": "الرئيسية",
@@ -76,7 +82,9 @@
     "errorInvalidCredentials": "بيانات الدخول غير صحيحة",
     "errorEmailExists": "البريد الإلكتروني مستخدم بالفعل",
     "errorGeneric": "تعذر إكمال العملية، حاول مرة أخرى",
-    "successCheckEmail": "تم إنشاء الحساب! تحقق من بريدك الإلكتروني للتفعيل."
+    "successCheckEmail": "تم إنشاء الحساب! تحقق من بريدك الإلكتروني للتفعيل.",
+    "errorTitle": "خطأ في المصادقة",
+    "tryAgain": "إعادة المحاولة"
   },
   "product": {
     "category": "التصنيف",
@@ -97,7 +105,9 @@
     "conditionUsed": "مستعمل",
     "conditionRefurbished": "مجدد",
     "negotiable": "قابل للتفاوض",
-    "notFound": "الإعلان غير موجود"
+    "notFound": "الإعلان غير موجود",
+    "errorLoading": "تعذر تحميل المنتج",
+    "tryAgain": "إعادة المحاولة"
   },
   "store": {
     "verified": "✅ موثق",
@@ -112,7 +122,9 @@
     "statRating": "تقييم إيجابي",
     "directCall": "اتصال مباشر",
     "openingHours": "أوقات العمل",
-    "noStore": "هذا المتجر غير موجود"
+    "noStore": "هذا المتجر غير موجود",
+    "errorLoading": "تعذر تحميل المتجر",
+    "tryAgain": "إعادة المحاولة"
   },
   "sell": {
     "title": "أضف إعلانك",
@@ -143,7 +155,8 @@
     "writePlaceholder": "اكتب رسالتك...",
     "sendButton": "إرسال",
     "online": "متصل",
-    "typing": "يكتب..."
+    "typing": "يكتب...",
+    "errorTitle": "تعذر تحميل الرسائل"
   },
   "profile": {
     "title": "حسابي",

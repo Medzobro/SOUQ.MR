@@ -17,7 +17,13 @@
     "back": "Retour",
     "next": "Suivant",
     "skip": "Passer",
-    "more": "Plus"
+    "more": "Plus",
+    "notFound": "Page introuvable",
+    "notFoundDescription": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "goHome": "Retour à l'accueil",
+    "errorTitle": "Une erreur est survenue",
+    "errorDescription": "Une erreur inattendue est survenue. Veuillez réessayer.",
+    "tryAgain": "Réessayer"
   },
   "nav": {
     "home": "Accueil",
@@ -76,7 +82,9 @@
     "errorInvalidCredentials": "Identifiants invalides",
     "errorEmailExists": "Cet email est déjà utilisé",
     "errorGeneric": "Une erreur est survenue, réessayez",
-    "successCheckEmail": "Compte créé ! Vérifiez votre email pour l'activer."
+    "successCheckEmail": "Compte créé ! Vérifiez votre email pour l'activer.",
+    "errorTitle": "Erreur d'authentification",
+    "tryAgain": "Réessayer"
   },
   "product": {
     "category": "Catégorie",
@@ -97,7 +105,9 @@
     "conditionUsed": "Occasion",
     "conditionRefurbished": "Reconditionné",
     "negotiable": "Prix négociable",
-    "notFound": "Annonce introuvable"
+    "notFound": "Annonce introuvable",
+    "errorLoading": "Impossible de charger le produit",
+    "tryAgain": "Réessayer"
   },
   "store": {
     "verified": "✅ Vérifié",
@@ -112,7 +122,9 @@
     "statRating": "avis positifs",
     "directCall": "Appel direct",
     "openingHours": "Horaires",
-    "noStore": "Cette boutique n'existe pas"
+    "noStore": "Cette boutique n'existe pas",
+    "errorLoading": "Impossible de charger la boutique",
+    "tryAgain": "Réessayer"
   },
   "sell": {
     "title": "Publier une annonce",
@@ -143,7 +155,8 @@
     "writePlaceholder": "Écrire un message...",
     "sendButton": "Envoyer",
     "online": "En ligne",
-    "typing": "Écrit..."
+    "typing": "Écrit...",
+    "errorTitle": "Impossible de charger les messages"
   },
   "profile": {
     "title": "Mon compte",

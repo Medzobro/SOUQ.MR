@@ -1,15 +1,18 @@
-import { getTranslations } from 'next-intl/server';
-import { Link } from '@/i18n/routing';
+'use client';
 
-export default async function NotFound() {
-  const t = await getTranslations('product');
-  const tNav = await getTranslations('nav');
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+
+export default function NotFound() {
+  const t = useTranslations('product');
+  const n = useTranslations('nav');
+
   return (
-    <div className="empty-state" style={{ paddingTop: 120 }}>
-      <div className="empty-state-icon">🔎</div>
-      <p>{t('notFound')}</p>
-      <Link href="/" className="btn-primary" style={{ display: 'inline-block', marginTop: 16 }}>
-        {tNav('home')}
+    <div className="empty-state">
+      <span style={{ fontSize: '3rem' }}>🔎</span>
+      <h2>{t('notFound') || 'Product not found'}</h2>
+      <Link href="/" className="btn-primary" style={{ marginTop: '1rem', display: 'inline-block' }}>
+        {n('home') || 'Back to home'}
       </Link>
     </div>
   );

@@ -1316,3 +1316,151 @@ select.input-field {
     padding: 28px 22px;
   }
 }
+
+/* ===== Loading States ===== */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  width: 100%;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border, #333);
+  border-top-color: var(--color-accent, #ff6b35);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Skeleton Loading ===== */
+.skeleton-gallery,
+.skeleton-title,
+.skeleton-price,
+.skeleton-details,
+.skeleton-actions,
+.skeleton-banner,
+.skeleton-avatar,
+.skeleton-stats,
+.skeleton-tabs,
+.skeleton-header,
+.skeleton-bubble-left,
+.skeleton-bubble-right,
+.skeleton-composer {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-secondary, #1a1a2e) 25%,
+    var(--color-bg-tertiary, #2a2a3e) 50%,
+    var(--color-bg-secondary, #1a1a2e) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Product skeleton */
+.product-loading-skeleton {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.product-loading-skeleton .skeleton-gallery { height: 300px; }
+.product-loading-skeleton .skeleton-title { height: 32px; width: 60%; }
+.product-loading-skeleton .skeleton-price { height: 28px; width: 30%; }
+.product-loading-skeleton .skeleton-details { height: 100px; }
+.product-loading-skeleton .skeleton-actions { height: 48px; }
+
+/* Store skeleton */
+.store-loading-skeleton {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.store-loading-skeleton .skeleton-banner { height: 160px; }
+.store-loading-skeleton .skeleton-avatar { height: 64px; width: 64px; border-radius: 50%; }
+.store-loading-skeleton .skeleton-stats { height: 60px; }
+.store-loading-skeleton .skeleton-tabs { height: 44px; }
+
+/* Chat skeleton */
+.chat-loading-skeleton {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.chat-loading-skeleton .skeleton-header { height: 56px; }
+.chat-loading-skeleton .skeleton-bubble-left { height: 40px; width: 70%; margin-left: 0; }
+.chat-loading-skeleton .skeleton-bubble-right { height: 40px; width: 60%; margin-left: auto; }
+.chat-loading-skeleton .skeleton-composer { height: 48px; margin-top: 2rem; }
+
+/* ===== Error Page ===== */
+.error-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg, #0a0a0f);
+  color: var(--color-text, #fff);
+  font-family: 'Cairo', sans-serif;
+}
+
+.error-container {
+  text-align: center;
+  padding: 2rem;
+  max-width: 480px;
+}
+
+.error-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.error-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--color-text, #fff);
+}
+
+.error-description {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary, #a0a0b0);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.empty-state h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text, #fff);
+  margin: 1rem 0 0.5rem;
+}
+
+.empty-state p {
+  color: var(--color-text-secondary, #a0a0b0);
+  max-width: 400px;
+  line-height: 1.6;
+}
