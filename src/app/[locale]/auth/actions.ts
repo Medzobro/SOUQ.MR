@@ -42,6 +42,19 @@ export async function signInAction(_prev: AuthState | null, formData: FormData):
     return { ok: false, error: 'errorInvalidCredentials' };
   }
 
+  // Auto-promote admin emails
+  const ADMIN_EMAILS = ['admin@market.mr', 'mohamed2024ar@gmail.com'];
+  if (ADMIN_EMAILS.includes(parsed.data.email.toLowerCase())) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('profiles').update({ role: 'admin' }).eq('id', user.id);
+      }
+    } catch {
+      // Non-critical — profile will be fixed on next login if this fails
+    }
+  }
+
   redirect('/');
 }
 
