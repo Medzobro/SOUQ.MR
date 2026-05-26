@@ -26,7 +26,9 @@ export async function requireAdmin(): Promise<string> {
     .eq('id', user.id)
     .single();
 
-  if (!data || data.role !== 'admin') throw new AdminAuthError();
+  const profile = data as { role: string } | null;
+
+  if (!profile || profile.role !== 'admin') throw new AdminAuthError();
 
   return user.id;
 }

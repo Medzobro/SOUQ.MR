@@ -13,11 +13,13 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect('/ar/auth');
   }
 
-  const { data: profile } = await supabase
+  const { data } = await supabase
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
     .single();
+
+  const profile = data as { role: string; full_name: string | null } | null;
 
   if (!profile || profile.role !== 'admin') {
     redirect('/ar');

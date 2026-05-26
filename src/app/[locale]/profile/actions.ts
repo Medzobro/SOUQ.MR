@@ -6,6 +6,11 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { slugify } from '@/lib/format';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function db(supabase: Awaited<ReturnType<typeof createClient>>): any {
+  return supabase;
+}
+
 const storeSchema = z.object({
   name: z.string().trim().min(2).max(80),
   description: z.string().trim().max(2000).optional().nullable(),
@@ -54,7 +59,7 @@ export async function upsertStoreAction(
   }
 
   // Promote profile to seller if needed
-  await supabase.from('profiles').update({ role: 'seller' } as never).eq('id', user.id);
+  await db(supabase).from('profiles').update({ role: 'seller' }).eq('id', user.id);
 
   const { data: existingData } = await supabase
     .from('stores')
@@ -64,7 +69,7 @@ export async function upsertStoreAction(
   const existing = existingData as { id: string; slug: string } | null;
 
   if (existing) {
-    const { error } = await supabase
+    const { error } = await db(supabase)
       .from('stores')
       .update({
         name: parsed.data.name,
@@ -75,12 +80,12 @@ export async function upsertStoreAction(
         opening_hours: parsed.data.opening_hours,
         avatar_url: parsed.data.avatar_url,
         cover_url: parsed.data.cover_url,
-      } as never)
+      })
       .eq('id', existing.id);
     if (error) return { ok: false, error: error.message };
   } else {
     const slugBase = slugify(parsed.data.name) || `store-${user.id.slice(0, 8)}`;
-    const { error } = await supabase.from('stores').insert({
+    const { error } = await db(supabase).from('stores').insert({
       owner_id: user.id,
       name: parsed.data.name,
       slug: `${slugBase}-${user.id.slice(0, 6)}`,
@@ -91,7 +96,7 @@ export async function upsertStoreAction(
       opening_hours: parsed.data.opening_hours,
       avatar_url: parsed.data.avatar_url,
       cover_url: parsed.data.cover_url,
-    } as never);
+    });
     if (error) return { ok: false, error: error.message };
   }
 

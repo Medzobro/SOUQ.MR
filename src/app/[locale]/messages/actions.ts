@@ -4,6 +4,11 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { cast } from '@/lib/supabase/helpers';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function db(supabase: Awaited<ReturnType<typeof createClient>>): any {
+  return supabase;
+}
+
 const startSchema = z.object({
   sellerId: z.string().uuid(),
   productId: z.string().uuid().optional().nullable(),
@@ -45,13 +50,13 @@ export async function startConversationAction(input: {
   let conversationId: string | null = cast<{ id: string } | null>(existingResult.data)?.id ?? null;
 
   if (!conversationId) {
-    const { data: created, error } = await supabase
+    const { data: created, error } = await db(supabase)
       .from('conversations')
       .insert({
         buyer_id: user.id,
         seller_id: parsed.data.sellerId,
         product_id: productId,
-      } as never)
+      })
       .select('id')
       .single();
     if (error || !created) return { ok: false, error: 'create_failed' };
@@ -79,11 +84,11 @@ export async function sendMessageAction(input: {
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: 'unauthenticated' };
 
-  const { error } = await supabase.from('messages').insert({
+  const { error } = await db(supabase).from('messages').insert({
     conversation_id: parsed.data.conversationId,
     sender_id: user.id,
     content: parsed.data.content,
-  } as never);
+  });
 
   if (error) return { ok: false, error: error.message };
   return { ok: true };
@@ -106,8 +111,8 @@ export async function markConversationReadAction(conversationId: string) {
   if (!conv) return;
 
   const isBuyer = conv.buyer_id === user.id;
-  await supabase
+  await db(supabase)
     .from('conversations')
-    .update((isBuyer ? { buyer_unread_count: 0 } : { seller_unread_count: 0 }) as never)
+    .update(isBuyer ? { buyer_unread_count: 0 } : { seller_unread_count: 0 })
     .eq('id', conversationId);
 }

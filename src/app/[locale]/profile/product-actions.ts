@@ -4,6 +4,11 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { moderateText } from '@/lib/moderation';
 
+function db(supabase: Awaited<ReturnType<typeof createClient>>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return supabase as any;
+}
+
 const ALL_LOCALES = ['/ar', '/fr', '/en'];
 
 function revalidateAll(...paths: string[]) {
@@ -38,17 +43,19 @@ export async function deleteMyProduct(productId: string) {
   if (!user) return { ok: false, error: 'غير مصرح' };
 
   // Verify ownership
-  const { data: product } = await supabase
+  const { data } = await supabase
     .from('products')
     .select('seller_id')
     .eq('id', productId)
     .single();
 
+  const product = data as { seller_id: string } | null;
+
   if (!product || product.seller_id !== user.id) {
     return { ok: false, error: 'غير مصرح بحذف هذا المنتج' };
   }
 
-  const { error } = await supabase.from('products').delete().eq('id', productId);
+  const { error } = await db(supabase).from('products').delete().eq('id', productId);
   if (error) return { ok: false, error: error.message };
 
   revalidateAll('/profile');
@@ -62,17 +69,19 @@ export async function markAsSold(productId: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: 'غير مصرح' };
 
-  const { data: product } = await supabase
+  const { data } = await supabase
     .from('products')
     .select('seller_id')
     .eq('id', productId)
     .single();
 
+  const product = data as { seller_id: string } | null;
+
   if (!product || product.seller_id !== user.id) {
     return { ok: false, error: 'غير مصرح' };
   }
 
-  const { error } = await supabase
+  const { error } = await db(supabase)
     .from('products')
     .update({ status: 'sold', is_promoted: false })
     .eq('id', productId);
@@ -89,17 +98,19 @@ export async function requestPromotion(productId: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: 'غير مصرح' };
 
-  const { data: product } = await supabase
+  const { data } = await supabase
     .from('products')
     .select('seller_id, status, promotion_requested, is_promoted')
     .eq('id', productId)
     .single();
 
+  const product = data as { seller_id: string; status: string; promotion_requested: boolean; is_promoted: boolean } | null;
+
   if (!product || product.seller_id !== user.id) return { ok: false, error: 'غير مصرح' };
   if (product.status !== 'active') return { ok: false, error: 'يمكن ترويج المنتجات النشطة فقط' };
   if (product.promotion_requested || product.is_promoted) return { ok: false, error: 'تم طلب الترويج مسبقاً' };
 
-  const { error } = await supabase
+  const { error } = await db(supabase)
     .from('products')
     .update({ promotion_requested: true, promotion_requested_at: new Date().toISOString() })
     .eq('id', productId);

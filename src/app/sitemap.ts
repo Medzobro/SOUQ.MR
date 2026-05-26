@@ -37,14 +37,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Products
-  const { data: products } = await supabase
+  const { data: productsData } = await supabase
     .from('products')
     .select('id, created_at')
     .eq('status', 'active')
     .order('created_at', { ascending: false })
     .limit(5000);
 
-  for (const p of products ?? []) {
+  const products = (productsData ?? []) as Array<{ id: string; created_at: string }>;
+
+  for (const p of products) {
     for (const locale of LOCALES) {
       entries.push({
         url: `${BASE_URL}/${locale}/product/${p.id}`,
@@ -56,12 +58,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Categories
-  const { data: categories } = await supabase
+  const { data: categoriesData } = await supabase
     .from('categories')
     .select('slug, created_at')
     .limit(100);
 
-  for (const c of categories ?? []) {
+  const categories = (categoriesData ?? []) as Array<{ slug: string; created_at: string }>;
+
+  for (const c of categories) {
     for (const locale of LOCALES) {
       entries.push({
         url: `${BASE_URL}/${locale}/search?category=${c.slug}`,
@@ -73,12 +77,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Stores
-  const { data: stores } = await supabase
+  const { data: storesData } = await supabase
     .from('stores')
     .select('id, created_at')
     .limit(5000);
 
-  for (const s of stores ?? []) {
+  const stores = (storesData ?? []) as Array<{ id: string; created_at: string }>;
+
+  for (const s of stores) {
     for (const locale of LOCALES) {
       entries.push({
         url: `${BASE_URL}/${locale}/store/${s.id}`,

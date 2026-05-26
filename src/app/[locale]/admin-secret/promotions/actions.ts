@@ -16,6 +16,12 @@ function revalidateAdmin(...paths: string[]) {
   }
 }
 
+/** Helper that works around Supabase type chain issues with update/delete */
+function db(supabase: Awaited<ReturnType<typeof createClient>>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return supabase as any;
+}
+
 // ── Get promotion requests ────────────────────────────────────────────
 
 export async function getPromotionRequests() {
@@ -51,7 +57,7 @@ export async function approvePromotion(productId: string, days: number = 7) {
   const until = new Date();
   until.setDate(until.getDate() + days);
 
-  const { error } = await supabase
+  const { error } = await db(supabase)
     .from('products')
     .update({
       is_promoted: true,
@@ -72,7 +78,7 @@ export async function revokePromotion(productId: string) {
   if (!auth.ok) return auth;
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { error } = await db(supabase)
     .from('products')
     .update({
       is_promoted: false,
@@ -93,7 +99,7 @@ export async function rejectPromotionRequest(productId: string) {
   if (!auth.ok) return auth;
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { error } = await db(supabase)
     .from('products')
     .update({ promotion_requested: false })
     .eq('id', productId);
