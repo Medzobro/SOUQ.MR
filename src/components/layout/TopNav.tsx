@@ -41,7 +41,7 @@ export default function TopNav() {
         <LocaleSwitcher />
         {authed === true ? (
           <Link href="/profile" className="btn-nav" aria-label={t('profile')}>
-            👤
+            {t('profile')}
           </Link>
         ) : authed === false ? (
           <>

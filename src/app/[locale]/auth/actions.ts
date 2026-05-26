@@ -101,6 +101,30 @@ export async function signUpAction(_prev: AuthState | null, formData: FormData):
   return { ok: true, message: 'successCheckEmail' };
 }
 
+export async function signInWithGoogleAction() {
+  const supabase = await createClient();
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${baseUrl}/auth/callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+
+  if (error) {
+    redirect('/auth?error=google');
+  }
+
+  if (data.url) {
+    redirect(data.url);
+  }
+}
+
 export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
