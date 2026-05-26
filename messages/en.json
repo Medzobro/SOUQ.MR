@@ -34,7 +34,11 @@
     "login": "Sign in",
     "registerFree": "Sign up",
     "addListing": "Sell",
-    "logoutShort": "Exit"
+    "logoutShort": "Exit",
+    "menu": "Menu",
+    "close": "Close",
+    "language": "Language",
+    "logout": "Sign out"
   },
   "home": {
     "heroBadge": "🇲🇷 Mauritania's #1 local marketplace",

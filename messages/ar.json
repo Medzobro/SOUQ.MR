@@ -34,7 +34,11 @@
     "login": "دخول",
     "registerFree": "سجل مجاناً",
     "addListing": "أضف إعلان",
-    "logoutShort": "خروج"
+    "logoutShort": "خروج",
+    "menu": "القائمة",
+    "close": "إغلاق",
+    "language": "اللغة",
+    "logout": "تسجيل خروج"
   },
   "home": {
     "heroBadge": "🇲🇷 السوق المحلي الأول في موريتانيا",

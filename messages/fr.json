@@ -34,7 +34,11 @@
     "login": "Connexion",
     "registerFree": "S'inscrire",
     "addListing": "Publier",
-    "logoutShort": "Sortir"
+    "logoutShort": "Sortir",
+    "menu": "Menu",
+    "close": "Fermer",
+    "language": "Langue",
+    "logout": "Déconnexion"
   },
   "home": {
     "heroBadge": "🇲🇷 La 1ère marketplace locale de Mauritanie",
