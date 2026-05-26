@@ -4,9 +4,12 @@ import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { cast } from '@/lib/supabase/helpers';
-
 import { moderateText, checkImageNSFW } from '@/lib/moderation';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function db(supabase: Awaited<ReturnType<typeof createClient>>): any {
+  return supabase;
+}
 
 const imageSchema = z.object({
   url: z.string().url(),
@@ -74,7 +77,7 @@ export async function createProductAction(
     return { ok: false, error: 'content_blocked' };
   }
 
-  // NSFW image check (scan uploaded image URLs)
+  // NSFW image check
   if (parsed.data.images.length > 0) {
     for (const img of parsed.data.images) {
       const nsfwResult = await checkImageNSFW(img.url);
@@ -84,19 +87,18 @@ export async function createProductAction(
     }
   }
 
-  // Find owner store (sellers should have one already)
+  // Find owner store
   const { data: storeData } = await supabase
     .from('stores')
     .select('id')
     .eq('owner_id', user.id)
     .maybeSingle();
-  const store = cast<{ id: string } | null>(storeData);
 
-  const { data: createdData, error } = await supabase
+  const { data: created, error } = await db(supabase)
     .from('products')
     .insert({
       seller_id: user.id,
-      store_id: store?.id ?? null,
+      store_id: (storeData as { id: string } | null)?.id ?? null,
       category_id: parsed.data.category_id ?? null,
       title: parsed.data.title,
       description: parsed.data.description ?? null,
@@ -106,10 +108,9 @@ export async function createProductAction(
       city: parsed.data.city ?? null,
       is_negotiable: parsed.data.is_negotiable,
       status: 'pending',
-    } as never)
+    })
     .select('id')
     .single();
-  const created = cast<{ id: string } | null>(createdData);
 
   if (error || !created) {
     console.error('[createProduct]', error);
@@ -122,12 +123,12 @@ export async function createProductAction(
       url: img.url,
       sort_order: i,
     }));
-    const { error: imgErr } = await supabase
+    const { error: imgErr } = await db(supabase)
       .from('product_images')
-      .insert(rows as never);
+      .insert(rows);
     if (imgErr) console.error('[createProductImages]', imgErr);
   }
 
   revalidatePath('/');
-  redirect(`/product/${created.id}`);
+  redirect(`/ar/product/${created.id}`);
 }

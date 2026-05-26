@@ -9,6 +9,7 @@ import ProductCard from '@/components/products/ProductCard';
 import FollowButton from '@/components/store/FollowButton';
 import MessageStoreButton from '@/components/store/MessageStoreButton';
 import StoreTabs from '@/components/store/StoreTabs';
+import ReviewForm from '@/components/store/ReviewForm';
 import type { Store, Product, ProductImage } from '@/lib/supabase/database.types';
 import type { AppLocale } from '@/i18n/routing';
 
@@ -163,15 +164,26 @@ export default async function StorePage({
     </div>
   );
 
-  const reviewsTab =
-    reviews.length === 0 ? (
-      <div className="empty-state">
-        <div className="empty-state-icon">⭐</div>
-        <p>{t('tabReviews')}</p>
-      </div>
-    ) : (
-      <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {reviews.map((r) => (
+  const reviewsTab = (
+    <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <ReviewForm
+        storeId={storeId}
+        ownerId={ownerId}
+        userId={user?.id ?? null}
+        writeReview={t('writeReview')}
+        yourRating={t('yourRating')}
+        yourComment={t('yourComment')}
+        submitReview={t('submitReview')}
+        reviewSubmitted={t('reviewSubmitted')}
+        cannotReviewOwn={t('cannotReviewOwn')}
+      />
+      {reviews.length === 0 ? (
+        <div className="empty-state" style={{ padding: 0 }}>
+          <div className="empty-state-icon">⭐</div>
+          <p>{t('tabReviews')}</p>
+        </div>
+      ) : (
+        reviews.map((r) => (
           <div
             key={r.id}
             style={{
@@ -194,9 +206,10 @@ export default async function StorePage({
               {formatRelative(r.created_at, locale)}
             </p>
           </div>
-        ))}
-      </div>
-    );
+        ))
+      )}
+    </div>
+  );
 
   return (
     <div style={{ paddingBottom: 80, paddingTop: 60 }}>

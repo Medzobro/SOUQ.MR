@@ -44,7 +44,7 @@ export default async function ProfilePage({
     supabase.from('profiles').select('*').eq('id', userId).single(),
     supabase
       .from('stores')
-      .select('id, name, slug, avatar_url, products_count, followers_count')
+      .select('id, name, slug, avatar_url, products_count, followers_count, rating')
       .eq('owner_id', userId)
       .maybeSingle(),
     supabase
@@ -69,7 +69,7 @@ export default async function ProfilePage({
   ]);
 
   const profile = cast<Profile | null>(profileRes.data);
-  const store = cast<Pick<Store, 'id' | 'name' | 'slug' | 'avatar_url' | 'products_count' | 'followers_count'> | null>(storeRes.data);
+  const store = cast<Pick<Store, 'id' | 'name' | 'slug' | 'avatar_url' | 'products_count' | 'followers_count' | 'rating'> | null>(storeRes.data);
   const myListings = cast<ProductWithImages[]>(listingsRes.data ?? []);
   const favoritesRows = cast<Array<{ product: ProductWithImages | null }>>(
     favoritesRes.data ?? [],
@@ -83,114 +83,191 @@ export default async function ProfilePage({
 
   return (
     <div style={{ paddingTop: 80, paddingBottom: 100 }}>
-      {/* ── Profile Header ──────────────────────────────────────── */}
-      <div style={{ padding: '0 20px 20px', textAlign: 'center' }}>
-        <div className="store-avatar" style={{ width: 80, height: 80, borderRadius: 24, marginInline: 'auto' }}>
-          {profile?.avatar_url ? (
-            <Image src={profile.avatar_url} alt="" fill sizes="80px" />
-          ) : (
-            <span style={{ fontSize: 36 }}>👤</span>
-          )}
-        </div>
-        <div style={{ fontSize: 22, fontWeight: 900, marginTop: 12 }}>{profile?.full_name ?? userEmail}</div>
-        <div style={{ fontSize: 13, color: 'var(--color-text-muted)', marginTop: 4 }} dir="ltr">
-          {userEmail}
-        </div>
-      </div>
-
-      {/* ── Stats Cards ──────────────────────────────────────────── */}
+      {/* ═══════════════════════════════════════════════════════════
+          🧑 SECTION 1 — ACCOUNT
+          ═══════════════════════════════════════════════════════════ */}
       <div style={{
-        padding: '0 20px 20px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 10,
+        margin: '0 20px 16px',
+        background: 'var(--color-bg-card)',
+        border: '1px solid var(--color-border)',
+        borderRadius: 16,
+        padding: 20,
       }}>
-        <div className="stat-card">
-          <div className="stat-num">{totalProducts}</div>
-          <div className="stat-label">{t('myListings')}</div>
+        <div style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color: 'var(--color-text-muted)',
+          textTransform: 'uppercase',
+          letterSpacing: 1,
+          marginBottom: 14,
+        }}>
+          👤 {t('title')}
         </div>
-        <div className="stat-card">
-          <div className="stat-num">{favorites.length}</div>
-          <div className="stat-label">{t('favorites')}</div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div className="store-avatar" style={{ width: 60, height: 60, borderRadius: 18, flexShrink: 0 }}>
+            {profile?.avatar_url ? (
+              <Image src={profile.avatar_url} alt="" fill sizes="60px" />
+            ) : (
+              <span style={{ fontSize: 28 }}>👤</span>
+            )}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 17, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {profile?.full_name ?? userEmail}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 2 }} dir="ltr">
+              {userEmail}
+            </div>
+          </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-num">{isSeller ? '🏪' : '🛒'}</div>
-          <div className="stat-label">{isSeller ? t('myStore') : t('becomeSeller')}</div>
+
+        {/* Stats row inside account card */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 16,
+          borderTop: '1px solid var(--color-border)',
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 20, fontWeight: 900 }}>{totalProducts}</div>
+            <div style={{ fontSize: 10, color: 'var(--color-text-muted)' }}>{t('myListings')}</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 20, fontWeight: 900 }}>{favorites.length}</div>
+            <div style={{ fontSize: 10, color: 'var(--color-text-muted)' }}>{t('favorites')}</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 20, fontWeight: 900 }}>{profile?.role === 'seller' ? '🏪' : '🛒'}</div>
+            <div style={{ fontSize: 10, color: 'var(--color-text-muted)' }}>{profile?.role === 'seller' ? t('myStore') : '—'}</div>
+          </div>
         </div>
+
+        {/* Logout */}
+        <form action={signOutAction} style={{ marginTop: 14 }}>
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              fontSize: 12,
+              padding: '8px',
+              borderRadius: 10,
+              border: '1px solid var(--color-border)',
+              background: 'transparent',
+              color: 'var(--color-text-muted)',
+              cursor: 'pointer',
+            }}
+          >
+            🚪 {t('logout')}
+          </button>
+        </form>
       </div>
 
-      {/* ── Store Card or Create Store CTA ──────────────────────── */}
-      <div style={{ padding: '0 20px 20px' }}>
+      {/* ═══════════════════════════════════════════════════════════
+          🏪 SECTION 2 — STORE
+          ═══════════════════════════════════════════════════════════ */}
+      <div style={{
+        margin: '0 20px 16px',
+        background: 'var(--color-bg-card)',
+        border: '1px solid var(--color-border)',
+        borderRadius: 16,
+        padding: 20,
+      }}>
+        <div style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color: 'var(--color-text-muted)',
+          textTransform: 'uppercase',
+          letterSpacing: 1,
+          marginBottom: 14,
+        }}>
+          🏪 {t('myStore')}
+        </div>
+
         {store ? (
-          <div style={{
-            background: 'var(--color-bg-card-2)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 14,
-            padding: 16,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
-              <Link href={`/store/${store.id}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 14, flex: 1 }}>
-                <div className="store-avatar" style={{ width: 52, height: 52, borderRadius: 14, flexShrink: 0 }}>
-                  {store.avatar_url ? (
-                    <Image src={store.avatar_url} alt="" fill sizes="52px" />
-                  ) : (
-                    <span style={{ fontSize: 24 }}>🏪</span>
-                  )}
+          <>
+            <Link href={`/store/${store.id}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+              <div className="store-avatar" style={{ width: 52, height: 52, borderRadius: 14, flexShrink: 0 }}>
+                {store.avatar_url ? (
+                  <Image src={store.avatar_url} alt="" fill sizes="52px" />
+                ) : (
+                  <span style={{ fontSize: 24 }}>🏪</span>
+                )}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--color-text)' }}>{store.name}</div>
+                <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 2 }}>
+                  {store.products_count ?? 0} {t('myListings')} · {store.followers_count ?? 0} متابع · ⭐ {Number(store.rating || 0).toFixed(1)}
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--color-text)' }}>{store.name}</div>
-                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 2 }}>
-                    {store.products_count ?? 0} {t('myListings')} · {store.followers_count ?? 0} متابع
-                  </div>
-                </div>
+              </div>
+            </Link>
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Link
+                href="/sell"
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  background: 'var(--color-accent)',
+                  color: '#fff',
+                  borderRadius: 10,
+                  padding: '10px',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                }}
+              >
+                ➕ {tNav('addListing')}
               </Link>
               <Link
                 href="/profile/store"
                 style={{
-                  background: 'var(--color-bg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 4,
+                  background: 'var(--color-bg-card-2)',
                   border: '1px solid var(--color-border)',
                   borderRadius: 10,
-                  padding: '8px 14px',
-                  fontSize: 12,
+                  padding: '10px 14px',
+                  fontSize: 13,
                   fontWeight: 600,
                   color: 'var(--color-text)',
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',
                 }}
               >
-                ✏️ تعديل
+                ✏️
+              </Link>
+              <Link
+                href={`/store/${store.id}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'var(--color-bg-card-2)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 10,
+                  padding: '10px 14px',
+                  fontSize: 18,
+                  color: 'var(--color-text)',
+                  textDecoration: 'none',
+                }}
+              >
+                👁
               </Link>
             </div>
-            <Link
-              href="/sell"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                background: 'var(--color-accent)',
-                color: '#fff',
-                borderRadius: 12,
-                padding: '12px',
-                fontSize: 14,
-                fontWeight: 700,
-                textDecoration: 'none',
-              }}
-            >
-              ➕ {tNav('addListing')}
-            </Link>
-          </div>
+          </>
         ) : (
-          <div style={{
-            background: 'var(--color-bg-card-2)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 14,
-            padding: 24,
-            textAlign: 'center',
-          }}>
-            <div style={{ fontSize: 40, marginBottom: 10 }}>🏪</div>
-            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>{t('becomeSeller')}</div>
-            <div style={{ fontSize: 13, color: 'var(--color-text-muted)', marginBottom: 16 }}>
+          <div style={{ textAlign: 'center', padding: '12px 0' }}>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>🏪</div>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{t('becomeSeller')}</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 14 }}>
               {t('createStoreSubtitle')}
             </div>
             <Link
@@ -199,9 +276,9 @@ export default async function ProfilePage({
                 display: 'inline-block',
                 background: 'var(--color-accent)',
                 color: '#fff',
-                borderRadius: 12,
-                padding: '12px 28px',
-                fontSize: 15,
+                borderRadius: 10,
+                padding: '10px 24px',
+                fontSize: 14,
                 fontWeight: 700,
                 textDecoration: 'none',
               }}
@@ -212,32 +289,10 @@ export default async function ProfilePage({
         )}
       </div>
 
-      {/* ── Quick Add Listing ────────────────────────────────────── */}
-      {isSeller && totalProducts === 0 && (
-        <div style={{ padding: '0 20px 20px' }}>
-          <Link
-            href="/sell"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 10,
-              background: 'linear-gradient(135deg, var(--color-accent), var(--color-gold))',
-              color: '#000',
-              borderRadius: 14,
-              padding: '16px',
-              fontSize: 15,
-              fontWeight: 800,
-              textDecoration: 'none',
-            }}
-          >
-            ➕ {tNav('addListing')}
-          </Link>
-        </div>
-      )}
-
-      {/* ── My Listings ─────────────────────────────────────────── */}
-      {myListings.length > 0 ? (
+      {/* ═══════════════════════════════════════════════════════════
+          📦 SECTION 3 — MY LISTINGS
+          ═══════════════════════════════════════════════════════════ */}
+      {myListings.length > 0 && (
         <div className="section" style={{ paddingTop: 0 }}>
           <div className="section-header">
             <div className="section-title">📦 {t('myListings')} ({totalProducts})</div>
@@ -247,9 +302,9 @@ export default async function ProfilePage({
                 style={{
                   background: 'var(--color-accent)',
                   color: '#000',
-                  borderRadius: 10,
-                  padding: '6px 14px',
-                  fontSize: 12,
+                  borderRadius: 8,
+                  padding: '5px 12px',
+                  fontSize: 11,
                   fontWeight: 700,
                   textDecoration: 'none',
                 }}
@@ -278,10 +333,12 @@ export default async function ProfilePage({
             ))}
           </div>
         </div>
-      ) : null}
+      )}
 
-      {/* ── Favorites ───────────────────────────────────────────── */}
-      {favorites.length > 0 ? (
+      {/* ═══════════════════════════════════════════════════════════
+          ❤️ SECTION 4 — FAVORITES
+          ═══════════════════════════════════════════════════════════ */}
+      {favorites.length > 0 && (
         <div className="section" style={{ paddingTop: 0 }}>
           <div className="section-header">
             <div className="section-title">❤️ {t('favorites')} ({favorites.length})</div>
@@ -306,32 +363,13 @@ export default async function ProfilePage({
             ))}
           </div>
         </div>
-      ) : null}
+      )}
 
-      {/* ── Product Management (mark sold / promote / delete) ────── */}
+      {/* ═══════════════════════════════════════════════════════════
+          ⚙️ SECTION 5 — PRODUCT MANAGEMENT
+          ═══════════════════════════════════════════════════════════ */}
       <div style={{ padding: '0 20px' }}>
         <MyProducts />
-      </div>
-
-      {/* ── Logout ──────────────────────────────────────────────── */}
-      <div style={{ padding: '24px 20px 0' }}>
-        <form action={signOutAction}>
-          <button
-            type="submit"
-            style={{
-              width: '100%',
-              fontSize: 14,
-              padding: '12px',
-              borderRadius: 12,
-              border: '1px solid var(--color-border)',
-              background: 'transparent',
-              color: 'var(--color-text-muted)',
-              cursor: 'pointer',
-            }}
-          >
-            🚪 {t('logout')}
-          </button>
-        </form>
       </div>
     </div>
   );
