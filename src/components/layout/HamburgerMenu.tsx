@@ -9,6 +9,7 @@ import { routing, type AppLocale } from '@/i18n/routing';
 export default function HamburgerMenu() {
   const [open, setOpen] = useState(false);
   const [authed, setAuthed] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale() as AppLocale;
@@ -16,33 +17,52 @@ export default function HamburgerMenu() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setAuthed(Boolean(data.user)));
+    supabase.auth.getUser().then(({ data }) => {
+      setAuthed(Boolean(data.user));
+      setUserName(data.user?.user_metadata?.full_name ?? null);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setAuthed(Boolean(session?.user));
+      setUserName(session?.user?.user_metadata?.full_name ?? null);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const close = useCallback(() => setOpen(false), []);
+  const close = useCallback(() => {
+    setOpen(false);
+  }, []);
 
   // Close on Escape
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
     document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [open, close]);
+    // Lock body scroll when open
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handler);
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
+  // Close on route change
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     close();
     router.push('/');
+    router.refresh();
   };
 
   const handleLocale = (next: AppLocale) => {
-    router.replace(pathname, { locale: next });
     close();
+    router.replace(pathname, { locale: next });
   };
 
   return (
@@ -67,7 +87,7 @@ export default function HamburgerMenu() {
         ≡
       </button>
 
-      {/* Overlay */}
+      {/* Overlay — click to close */}
       {open && (
         <div
           onClick={close}
@@ -81,143 +101,159 @@ export default function HamburgerMenu() {
       )}
 
       {/* Drawer */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          insetInlineEnd: 0,
-          width: 280,
-          height: '100%',
-          background: 'var(--color-bg-card)',
-          zIndex: 1001,
-          transform: open ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '24px 20px',
-          gap: 8,
-          boxShadow: '-4px 0 24px rgba(0,0,0,0.3)',
-        }}
-      >
-        {/* Close button */}
-        <button
-          type="button"
-          onClick={close}
-          aria-label={t('close')}
+      {open && (
+        <div
           style={{
-            alignSelf: 'flex-end',
-            background: 'none',
-            border: 'none',
-            color: 'var(--color-text-muted)',
-            fontSize: 28,
-            cursor: 'pointer',
-            padding: 4,
-            lineHeight: 1,
+            position: 'fixed',
+            top: 0,
+            insetInlineEnd: 0,
+            width: 280,
+            height: '100%',
+            background: 'var(--color-bg-card)',
+            zIndex: 1001,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '24px 20px',
+            gap: 8,
+            boxShadow: '-4px 0 24px rgba(0,0,0,0.3)',
+            animation: 'slideInRight 0.25s ease-out',
           }}
         >
-          ✕
-        </button>
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={close}
+            aria-label={t('close')}
+            style={{
+              alignSelf: 'flex-end',
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-text-muted)',
+              fontSize: 28,
+              cursor: 'pointer',
+              padding: 4,
+              lineHeight: 1,
+            }}
+          >
+            ✕
+          </button>
 
-        {/* Logo */}
-        <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: 1, marginBottom: 16 }}>
-          SOUQ.MR
-        </div>
-
-        {/* Language section */}
-        <div style={{ marginBottom: 8 }}>
-          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>
-            {t('language')}
+          {/* Logo */}
+          <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: 1, marginBottom: 8 }}>
+            SOUQ.MR
           </div>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {routing.locales.map((l) => (
+
+          {/* User greeting */}
+          {authed && userName && (
+            <div style={{
+              fontSize: 16,
+              fontWeight: 600,
+              color: 'var(--color-text)',
+              marginBottom: 8,
+              padding: '8px 0',
+            }}>
+              👋 {userName}
+            </div>
+          )}
+
+          {/* Language section */}
+          <div style={{ marginBottom: 8 }}>
+            <div style={{
+              fontSize: 11,
+              color: 'var(--color-text-muted)',
+              marginBottom: 8,
+              textTransform: 'uppercase',
+              letterSpacing: 1,
+            }}>
+              {t('language')}
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {routing.locales.map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => handleLocale(l)}
+                  style={{
+                    flex: 1,
+                    padding: '10px 8px',
+                    borderRadius: 8,
+                    border: l === locale ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
+                    background: l === locale ? 'var(--color-accent)' : 'transparent',
+                    color: l === locale ? '#000' : 'var(--color-text)',
+                    fontSize: 13,
+                    fontWeight: l === locale ? 700 : 400,
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                  }}
+                >
+                  {l === 'ar' ? '🇲🇷 عربي' : l === 'fr' ? '🇫🇷 FR' : '🇬🇧 EN'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ flex: 1 }} />
+
+          {/* Logout */}
+          {authed ? (
+            <div style={{
+              borderTop: '1px solid var(--color-border)',
+              paddingTop: 16,
+            }}>
               <button
-                key={l}
                 type="button"
-                onClick={() => handleLocale(l)}
+                onClick={handleLogout}
                 style={{
-                  flex: 1,
-                  padding: '10px 8px',
-                  borderRadius: 8,
-                  border: l === locale ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
-                  background: l === locale ? 'var(--color-accent)' : 'transparent',
-                  color: l === locale ? '#000' : 'var(--color-text)',
-                  fontSize: 13,
-                  fontWeight: l === locale ? 700 : 400,
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: 10,
+                  border: '1px solid rgba(231,76,60,0.3)',
+                  background: 'transparent',
+                  color: '#e74c3c',
+                  fontSize: 15,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   textAlign: 'center',
                 }}
               >
-                {l === 'ar' ? '🇲🇷 عربي' : l === 'fr' ? '🇫🇷 FR' : '🇬🇧 EN'}
+                🚪 {t('logout')}
               </button>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div style={{
+              borderTop: '1px solid var(--color-border)',
+              paddingTop: 16,
+            }}>
+              <button
+                type="button"
+                onClick={() => { close(); router.push('/auth'); }}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: 10,
+                  border: 'none',
+                  background: 'var(--color-accent)',
+                  color: '#000',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                }}
+              >
+                {t('login')}
+              </button>
+            </div>
+          )}
         </div>
+      )}
 
-        <div style={{ flex: 1 }} />
-
-        {/* Account section */}
-        {authed ? (
-          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <button
-              type="button"
-              onClick={() => { router.push('/profile'); close(); }}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: 10,
-                border: 'none',
-                background: 'var(--color-bg-card-2)',
-                color: 'var(--color-text)',
-                fontSize: 15,
-                fontWeight: 600,
-                cursor: 'pointer',
-                textAlign: 'center',
-              }}
-            >
-              👤 {t('profile')}
-            </button>
-            <button
-              type="button"
-              onClick={handleLogout}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: 10,
-                border: '1px solid var(--color-border)',
-                background: 'transparent',
-                color: '#e74c3c',
-                fontSize: 15,
-                fontWeight: 600,
-                cursor: 'pointer',
-                textAlign: 'center',
-              }}
-            >
-              🚪 {t('logout') ?? 'تسجيل خروج'}
-            </button>
-          </div>
-        ) : (
-          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <button
-              type="button"
-              onClick={() => { router.push('/auth'); close(); }}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: 10,
-                border: 'none',
-                background: 'var(--color-accent)',
-                color: '#000',
-                fontSize: 15,
-                fontWeight: 700,
-                cursor: 'pointer',
-                textAlign: 'center',
-              }}
-            >
-              {t('login')}
-            </button>
-          </div>
-        )}
-      </div>
+      {/* Keyframe animation */}
+      <style jsx>{`
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+      `}</style>
     </>
   );
 }
