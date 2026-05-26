@@ -67,24 +67,32 @@ export default function HamburgerMenu() {
 
   return (
     <>
-      {/* Hamburger button */}
+      {/* Hamburger button — 3 lines */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label={t('menu')}
         style={{
-          background: 'none',
-          border: 'none',
-          color: 'var(--color-text)',
-          fontSize: 24,
+          background: 'var(--color-bg-card-2)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 10,
           cursor: 'pointer',
-          padding: '4px 8px',
+          padding: '10px',
           display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
           alignItems: 'center',
-          lineHeight: 1,
+          justifyContent: 'center',
+          width: 40,
+          height: 40,
+          transition: 'background 0.2s',
         }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-bg-card)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-bg-card-2)'; }}
       >
-        ≡
+        <span style={{ width: 18, height: 2, background: 'var(--color-text)', borderRadius: 2 }} />
+        <span style={{ width: 18, height: 2, background: 'var(--color-text)', borderRadius: 2 }} />
+        <span style={{ width: 18, height: 2, background: 'var(--color-text)', borderRadius: 2 }} />
       </button>
 
       {/* Overlay — click to close */}
