@@ -6,6 +6,8 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { cast } from '@/lib/supabase/helpers';
 
+import { moderateText } from '@/lib/moderation';
+
 const imageSchema = z.object({
   url: z.string().url(),
   path: z.string().min(1),
@@ -66,6 +68,12 @@ export async function createProductAction(
     return { ok: false, error: 'validation' };
   }
 
+  // Content moderation
+  const modResult = moderateText(parsed.data.title, parsed.data.description);
+  if (!modResult.ok) {
+    return { ok: false, error: 'content_blocked' };
+  }
+
   // Find owner store (sellers should have one already)
   const { data: storeData } = await supabase
     .from('stores')
@@ -87,7 +95,7 @@ export async function createProductAction(
       condition: parsed.data.condition,
       city: parsed.data.city ?? null,
       is_negotiable: parsed.data.is_negotiable,
-      status: 'active',
+      status: 'pending',
     } as never)
     .select('id')
     .single();

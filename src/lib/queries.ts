@@ -18,15 +18,16 @@ export type ProductListRow = {
   product_images: Array<{ url: string; sort_order: number }>;
 };
 
-/** Latest active products for the home page. */
+/** Latest active products for the home page — promoted first. */
 export async function fetchLatestProducts(supabase: Supa, limit = 12): Promise<ProductListRow[]> {
   const { data, error } = await supabase
     .from('products')
     .select(
-      `id, title, price, currency, city, badge, status, created_at, category_id,
+      `id, title, price, currency, city, badge, status, created_at, category_id, is_promoted, promoted_until,
        product_images(url, sort_order)`,
     )
     .eq('status', 'active')
+    .order('is_promoted', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(limit);
 

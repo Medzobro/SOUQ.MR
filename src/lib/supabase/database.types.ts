@@ -156,6 +156,10 @@ export type Database = {
           is_negotiable: boolean;
           views_count: number;
           favorites_count: number;
+          is_promoted: boolean;
+          promoted_until: string | null;
+          promotion_requested: boolean;
+          promotion_requested_at: string | null;
           search_vector: unknown | null;
           created_at: string;
           updated_at: string;

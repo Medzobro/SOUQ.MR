@@ -23,7 +23,8 @@
     "goHome": "العودة للرئيسية",
     "errorTitle": "حدث خطأ ما",
     "errorDescription": "حدث خطأ غير متوقع. الرجاء المحاولة مرة أخرى.",
-    "tryAgain": "إعادة المحاولة"
+    "tryAgain": "إعادة المحاولة",
+    "optional": "اختياري"
   },
   "nav": {
     "home": "الرئيسية",
@@ -32,7 +33,8 @@
     "profile": "حسابي",
     "login": "دخول",
     "registerFree": "سجل مجاناً",
-    "addListing": "أضف إعلان"
+    "addListing": "أضف إعلان",
+    "logoutShort": "خروج"
   },
   "home": {
     "heroBadge": "🇲🇷 السوق المحلي الأول في موريتانيا",
@@ -176,7 +178,16 @@
     "storePhone": "رقم الهاتف للتواصل",
     "storeWhatsapp": "رقم واتساب",
     "storeOpeningHours": "أوقات العمل",
-    "openingHoursPlaceholder": "8 صباحاً - 10 مساءً"
+    "openingHoursPlaceholder": "8 صباحاً - 10 مساءً",
+    "openingHoursPresets": {
+      "24h": "طوال اليوم (24 ساعة)",
+      "morningEvening": "8 صباحاً - 10 مساءً",
+      "businessHours": "9 صباحاً - 6 مساءً",
+      "morningOnly": "8 صباحاً - 12 ظهراً",
+      "custom": "أوقات مخصصة"
+    },
+    "storeAvatar": "الصورة الشخصية للمتجر",
+    "storeCover": "صورة الخلفية للمتجر"
   },
   "cities": {
     "nouakchott": "نواكشوط",

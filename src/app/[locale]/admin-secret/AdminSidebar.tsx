@@ -9,6 +9,7 @@ const links = [
   { href: '/ar/admin-secret/stores', label: '🏪 المتاجر' },
   { href: '/ar/admin-secret/products', label: '📦 المنتجات' },
   { href: '/ar/admin-secret/pending', label: '⏳ قيد المراجعة' },
+  { href: '/ar/admin-secret/promotions', label: '⭐ الترويج' },
 ];
 
 export default function AdminSidebar({ userName }: { userName: string }) {

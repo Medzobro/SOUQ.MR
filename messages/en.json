@@ -23,7 +23,8 @@
     "goHome": "Go home",
     "errorTitle": "Something went wrong",
     "errorDescription": "An unexpected error occurred. Please try again.",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "optional": "Optional"
   },
   "nav": {
     "home": "Home",
@@ -32,7 +33,8 @@
     "profile": "Account",
     "login": "Sign in",
     "registerFree": "Sign up",
-    "addListing": "Sell"
+    "addListing": "Sell",
+    "logoutShort": "Exit"
   },
   "home": {
     "heroBadge": "🇲🇷 Mauritania's #1 local marketplace",
@@ -176,7 +178,16 @@
     "storePhone": "Contact phone",
     "storeWhatsapp": "WhatsApp number",
     "storeOpeningHours": "Opening hours",
-    "openingHoursPlaceholder": "8 AM - 10 PM"
+    "openingHoursPlaceholder": "8 AM - 10 PM",
+    "openingHoursPresets": {
+      "24h": "All day (24 hours)",
+      "morningEvening": "8 AM - 10 PM",
+      "businessHours": "9 AM - 6 PM",
+      "morningOnly": "8 AM - 12 PM",
+      "custom": "Custom hours"
+    },
+    "storeAvatar": "Store avatar",
+    "storeCover": "Store cover"
   },
   "cities": {
     "nouakchott": "Nouakchott",

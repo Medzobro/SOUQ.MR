@@ -134,7 +134,11 @@ export default function SellForm({ userId, categories, cities, locale }: Props) 
 
       {state?.ok === false ? (
         <div className="toast error" style={{ position: 'static', transform: 'none', marginBottom: 16 }}>
-          {state.error ?? 'errorGeneric'}
+          {state.error === 'validation'
+            ? tCommon('error')
+            : state.error === 'content_blocked'
+            ? '⚠️ المحتوى غير لائق. الرجاء تعديل النص.'
+            : state.error ?? tCommon('error')}
         </div>
       ) : null}
 

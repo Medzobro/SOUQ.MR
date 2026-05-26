@@ -6,6 +6,19 @@ import { updateSession } from '@/lib/supabase/middleware';
 const intlMiddleware = createIntlMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Redirect locale-less paths to default locale prefix
+  // e.g. /search → /ar/search, /sell → /ar/sell
+  const validLocales = ['ar', 'fr', 'en'];
+  const firstSegment = pathname.split('/')[1];
+  if (firstSegment && !validLocales.includes(firstSegment) && pathname !== '/') {
+    const locale = request.cookies.get('NEXT_LOCALE')?.value || 'ar';
+    const url = request.nextUrl.clone();
+    url.pathname = `/${locale}${pathname}`;
+    return NextResponse.redirect(url);
+  }
+
   // Run i18n middleware first (always works, no external deps)
   const intlResponse = intlMiddleware(request);
 

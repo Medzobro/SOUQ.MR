@@ -5,6 +5,7 @@ import { cast } from '@/lib/supabase/helpers';
 import { firstImageUrl } from '@/lib/queries';
 import ProductCard from '@/components/products/ProductCard';
 import { signOutAction } from './actions';
+import { MyProducts } from './MyProducts';
 import type { Profile, Product, ProductImage, Store } from '@/lib/supabase/database.types';
 import type { AppLocale } from '@/i18n/routing';
 
@@ -192,6 +193,10 @@ export default async function ProfilePage({
           </div>
         </div>
       ) : null}
+
+      <div style={{ padding: '0 20px' }}>
+        <MyProducts />
+      </div>
 
       <div style={{ padding: '0 20px' }}>
         <form action={signOutAction}>

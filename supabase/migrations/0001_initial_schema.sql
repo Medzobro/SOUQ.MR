@@ -4,7 +4,6 @@
 -- =====================================================================
 
 -- Extensions ----------------------------------------------------------
-create extension if not exists "uuid-ossp";
 create extension if not exists "pgcrypto";
 
 -- Helper: updated_at trigger -----------------------------------------
@@ -64,7 +63,7 @@ create trigger on_auth_user_created
 -- categories
 -- =====================================================================
 create table if not exists public.categories (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   slug text unique not null,
   name_ar text not null,
   name_fr text,
@@ -81,7 +80,7 @@ create index if not exists categories_parent_id_idx on public.categories(parent_
 -- stores
 -- =====================================================================
 create table if not exists public.stores (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references public.profiles(id) on delete cascade,
   name text not null,
   slug text unique not null,
@@ -113,7 +112,7 @@ create trigger stores_set_updated_at
 -- products
 -- =====================================================================
 create table if not exists public.products (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   store_id uuid references public.stores(id) on delete cascade,
   seller_id uuid not null references public.profiles(id) on delete cascade,
   category_id uuid references public.categories(id) on delete set null,
@@ -185,7 +184,7 @@ create trigger products_count_trigger
 -- product_images
 -- =====================================================================
 create table if not exists public.product_images (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   product_id uuid not null references public.products(id) on delete cascade,
   url text not null,
   sort_order int not null default 0,
@@ -259,7 +258,7 @@ create trigger followers_count_trigger
 -- conversations & messages (chat)
 -- =====================================================================
 create table if not exists public.conversations (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   buyer_id uuid not null references public.profiles(id) on delete cascade,
   seller_id uuid not null references public.profiles(id) on delete cascade,
   product_id uuid references public.products(id) on delete set null,
@@ -275,7 +274,7 @@ create index if not exists conversations_buyer_idx on public.conversations(buyer
 create index if not exists conversations_seller_idx on public.conversations(seller_id, last_message_at desc);
 
 create table if not exists public.messages (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   conversation_id uuid not null references public.conversations(id) on delete cascade,
   sender_id uuid not null references public.profiles(id) on delete cascade,
   content text not null check (length(content) > 0),
@@ -315,7 +314,7 @@ create trigger messages_after_insert
 -- reviews (buyers reviewing stores)
 -- =====================================================================
 create table if not exists public.reviews (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   store_id uuid not null references public.stores(id) on delete cascade,
   reviewer_id uuid not null references public.profiles(id) on delete cascade,
   rating int not null check (rating between 1 and 5),
@@ -356,7 +355,7 @@ create trigger reviews_rating_trigger
 -- notifications
 -- =====================================================================
 create table if not exists public.notifications (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   type text not null,
   title text not null,
