@@ -73,8 +73,8 @@ export default function HamburgerMenu() {
         onClick={() => setOpen(true)}
         aria-label={t('menu')}
         style={{
-          background: 'var(--color-bg-card-2)',
-          border: '1px solid var(--color-border)',
+          background: '#1A1A24',
+          border: '1px solid #333',
           borderRadius: 10,
           cursor: 'pointer',
           padding: '10px',
@@ -87,8 +87,8 @@ export default function HamburgerMenu() {
           height: 40,
           transition: 'background 0.2s',
         }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-bg-card)'; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-bg-card-2)'; }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#252530'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#1A1A24'; }}
       >
         <span style={{ width: 18, height: 2, background: 'var(--color-text)', borderRadius: 2 }} />
         <span style={{ width: 18, height: 2, background: 'var(--color-text)', borderRadius: 2 }} />
