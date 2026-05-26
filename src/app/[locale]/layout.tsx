@@ -71,6 +71,8 @@ export const viewport: Viewport = {
   themeColor: '#0A0A0F',
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default async function LocaleLayout({
@@ -94,6 +96,12 @@ export default async function LocaleLayout({
       className={`${cairo.variable} ${bebas.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="format-detection" content="telephone=no" />
+      </head>
       <body>
         <NextIntlClientProvider messages={messages}>
           <TopNav />

@@ -26,8 +26,8 @@ export default function SearchBar() {
           onChange={(e) => setQ(e.target.value)}
           aria-label={t('searchPlaceholder')}
         />
-        <button type="submit" className="filter-btn" aria-label={t('filter')}>
-          ⚙️ {t('filter')}
+        <button type="submit" className="filter-btn" aria-label={t('search')}>
+          🔍 {t('search')}
         </button>
       </div>
     </form>
