@@ -80,35 +80,9 @@ function checkRateLimit(ip: string, config: { bucket: string; max: number; windo
   return true; // allowed
 }
 
-// ── Admin-secret protection ─────────────────────────────────────────
-// Protected admin route segments — only authenticated admin users
-// may access these. Non-admin users are redirected to home.
-const PROTECTED_SEGMENTS = ['admin-secret'];
-
-function isProtectedPath(pathname: string): boolean {
-  return PROTECTED_SEGMENTS.some((seg) => pathname.includes(`/${seg}`));
-}
-
+// ── Locale redirect ──────────────────────────────────────────────────
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-
-  // ── Admin-secret protection ───────────────────────────────────────────
-  // Redirect unauthenticated / non-admin users trying to access admin routes
-  if (isProtectedPath(pathname)) {
-    // Check for admin session via a simple cookie-based mechanism.
-    // Requires the auth cookie (set by Supabase) to already contain
-    // admin-level claims. Without a valid admin session, redirect home.
-    const adminAuthCookie = request.cookies.get('sb-admin-auth')?.value;
-    // Also check for standard Supabase auth session as fallback
-    const hasAnySession = request.cookies.get('sb-access-token') || request.cookies.get('sb-refresh-token');
-
-    if (!adminAuthCookie && !hasAnySession) {
-      const locale = request.cookies.get('NEXT_LOCALE')?.value || 'ar';
-      const url = request.nextUrl.clone();
-      url.pathname = `/${locale}`;
-      return NextResponse.redirect(url);
-    }
-  }
 
   // ── Rate limiting ────────────────────────────────────────────────────
   // Only rate limit POST requests to sensitive routes

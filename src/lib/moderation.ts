@@ -1,11 +1,9 @@
 /**
- * Content moderation — NSFW / offensive content filter for Arabic, Hassaniya,
- * French & English. Used server-side before saving products and on report reviews.
- *
- * Also includes placeholder NSFW image detection.
+ * Content moderation — NSFW / offensive content filter for Arabic, French & Hassaniya.
+ * Used server-side before saving products and on report reviews.
  */
 
-// ── Arabic (MSA) offensive words ───────────────────────────────────────
+// ── Arabic offensive words ────────────────────────────────────────────
 const AR_BAD_WORDS = [
   'كس', 'طيز', 'زب', 'منيوك', 'شرموط', 'قحبة', 'عاهرة', 'ديوث',
   'خول', 'لوطي', 'فحل', 'نياك', 'متناك', 'بعبص', 'كلب', 'حمار',
@@ -15,72 +13,23 @@ const AR_BAD_WORDS = [
   'slut', 'bastard', 'bitch', 'cunt', 'cock',
 ];
 
-// ── Hassaniya Arabic (Mauritanian dialect) offensive words ─────────────
-const HASSANIYA_BAD_WORDS = [
-  'زامل',     // vulgar term equivalent to pimp / immoral person
-  'گحبة',     // equivalent to whore (ـگـ = kaf with ring, dialect spelling)
-  'كحبة',     // same word with regular kaf
-  'قحبة',     // already in AR list, but kept here for dialect overlap
-  'زاملين',   // plural of زامل
-  'گحاب',     // plural of گحبة
-  'كحاب',     // plural variant
-  'منيوكة',   // feminine form
-  'مصاص',     // vulgar
-  'لحاس',     // vulgar
-  'طابون',    // insult
-  'بغل',      // mule (used as insult)
-  'خنفوس',    // derogatory term
-  'بوگلاب',   // "father of dogs"
-  'ولد الكلب', // "son of a dog"
-  'ولد القحبة',// "son of a whore"
-  'ولد الزامل',// "son of a pimp"
-  'خي',       // brother (vulgar context)
-  'منايك',    // plural vulgar
+// ── French offensive words ────────────────────────────────────────────
+const FR_BAD_WORDS = [
+  'putain', 'merde', 'salope', 'connard', 'enculé', 'encule', 'pute',
+  'bâtard', 'batard', 'pédé', 'pede', 'bite', 'couille', 'branler',
+  'niquer', 'fils de pute', 'fdp', 'ta gueule', 'tg', 'salaud',
+  'poufiasse', 'trainée', 'trainee', 'pétasse', 'petasse', 'gouine',
+  'tapette', 'tarlouze', 'nègre', 'negre', 'bicot', 'bougnoule',
+  'pd', 'ntm', 'enfoiré', 'enfoire', 'abruti', 'débile', 'debile',
 ];
 
-// ── French offensive words ─────────────────────────────────────────────
-const FR_BAD_WORDS = [
-  // Strong profanity
-  'putain', 'putain de', 'merde', 'fait chier', 'emmerder',
-  'salope', 'salopard', 'saloperie',
-  'connard', 'connasse',
-  'enculé', 'enculer', 'enculeur',
-  'pute', 'putain',
-  'bâtard', 'batard',
-  'pédé', 'pede', 'pédale', 'pedale',
-  'tapette', 'tantouze', 'tarlouze', 'folle', 'gouine',
-
-  // Sexual / vulgar
-  'bite', 'bitte', 'queue', 'verge',
-  'couille', 'couillon', 'couillonne',
-  'cul', 'trou du cul', 'trouduc', 'fion',
-  'chatte', 'minou', 'foufoune',
-  'branler', 'branleur', 'branlette',
-  'baiser', 'baise', 'baiseur', 'baisable',
-  'niquer', 'nique', 'nique ta mère', 'ntm',
-  'suce', 'sucer', 'suceuse',
-  'pipe', 'tailler une pipe',
-  'sodomie', 'sodomiser',
-
-  // Racial / discriminatory slurs (flagged for moderation)
-  'nègre', 'negre', 'négresse', 'negresse',
-  'bougnoule', 'bicot', 'raton',
-  'youpin', 'youpine', 'feuj',
-  'chinetoque', 'niakoué', 'niakoue',
-  'crouille', 'crouillat',
-  'rouquin', 'rouquine', 'roux',
-  'métèque', 'meteque', 'métèques',
-
-  // General insults
-  'poufiasse', 'pouffiasse',
-  'grognasse', 'pétasse', 'petasse',
-  'morue',
-  'ordure', 'pourriture',
-  'débile', 'debile', 'crétin', 'cretin', 'abruti', 'abrutie',
-  'fils de pute', 'fdp',
-  'ta gueule', 'tg',
-  'vas te faire foutre', 'va te faire enculer',
-  'mange tes morts',
+// ── Hassaniya Arabic (Mauritanian dialect) ───────────────────────────
+const HASSANIYA_BAD_WORDS = [
+  'زامل', 'گحبة', 'كحبة', 'گحاب', 'كحاب', 'منيوكة', 'منيوك',
+  'مصاص', 'لحاس', 'طابون', 'بغل', 'خنفوس',
+  'بوگلاب', 'بوكلاب', 'ولد الكلب', 'ولد القحبة',
+  'ولد الزامل', 'بنت القحبة', 'انت بغل', 'يا زامل',
+  'شرموطة', 'قحبة', 'عاهرة', 'فاجرة', 'زانية',
 ];
 
 // ── Normalize Arabic text ─────────────────────────────────────────────
@@ -97,79 +46,49 @@ function normalizeArabic(text: string): string {
 }
 
 // ── Character substitution map (bypass detection) ──────────────────────
-// Common leetspeak / substitution tricks
 const SUBSTITUTION_MAP: Record<string, string> = {
-  '0': 'o',
-  '1': 'i',
-  '2': 'z',
-  '3': 'e',
-  '4': 'a',
-  '5': 's',
-  '6': 'g',
-  '7': 't',
-  '8': 'b',
-  '9': 'g',
-  '@': 'a',
-  '$': 's',
-  '!': 'i',
-  '+': 't',
-  '(': 'c',
+  '0': 'o', '1': 'i', '2': 'z', '3': 'e', '4': 'a',
+  '5': 's', '6': 'g', '7': 't', '8': 'b', '9': 'g',
+  '@': 'a', '$': 's', '!': 'i', '+': 't', '(': 'c',
   '|': 'i',
-  '°': 'o',
-  // Arabic character substitutions
-  '٠': '0',
-  '١': '1',
-  '٢': '2',
-  '٣': '3',
-  '٤': '4',
-  '٥': '5',
-  '٦': '6',
-  '٧': '7',
-  '٨': '8',
-  '٩': '9',
 };
 
 function normalizeSubstitutions(text: string): string {
-  return text
-    .split('')
-    .map((ch) => SUBSTITUTION_MAP[ch] ?? ch)
-    .join('');
-}
-
-// ── Regex-based detection for spaced-out words ─────────────────────────
-// Matches words where each letter is separated by one or more spaces/symbols
-// e.g. "p u t a i n" or "p.u.t.a.i.n" or "p-u-t-a-i-n"
-function buildSpacedRegex(word: string): RegExp {
-  const chars = word.split('').map((ch) => escapeRegex(ch));
-  // Allow spaces, dots, hyphens, underscores between each letter
-  const pattern = chars.join('[\\s.\\-_,;:*+~]+');
-  return new RegExp(pattern, 'i');
-}
-
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-/**
- * Detect if a word (possibly with substitution tricks) matches any bad word.
- * Checks: direct match, substitution-normalized match, and spaced-out pattern.
- */
-function detectBadWord(input: string, badWordsList: string[]): string | null {
-  for (const bad of badWordsList) {
-    const normBad = normalizeArabic(bad.toLowerCase());
-    const normBadSub = normalizeSubstitutions(normBad);
-
-    // Direct match (input is already lowered and normalized)
-    if (input.includes(normBad)) return bad;
-
-    // Substitution-normalized match
-    const inputSub = normalizeSubstitutions(input);
-    if (inputSub.includes(normBadSub)) return bad;
-
-    // Spaced-out regex match
-    const spacedRe = buildSpacedRegex(normBad);
-    if (spacedRe.test(input)) return bad;
+  let result = '';
+  for (const ch of text) {
+    result += SUBSTITUTION_MAP[ch] ?? ch;
   }
+  return result;
+}
+
+// ── Spaced-out word detection ─────────────────────────────────────────
+function buildSpacedRegex(word: string): RegExp {
+  const chars = word.split('').map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return new RegExp(chars.join(`[\\s.\\-_,;:*+~]+`), 'i');
+}
+
+// ── Main detection function ───────────────────────────────────────────
+function detectBadWord(text: string, badWords: string[]): string | null {
+  const normalizedText = normalizeArabic(text);
+
+  for (const word of badWords) {
+    const norm = normalizeArabic(word.toLowerCase());
+
+    // 1. Direct match
+    if (normalizedText.includes(norm)) return word;
+
+    // 2. Substitution-normalized match
+    const subbedText = normalizeSubstitutions(normalizedText);
+    const subbedWord = normalizeSubstitutions(norm);
+    if (subbedText.includes(subbedWord)) return word;
+
+    // 3. Spaced-out regex match (only for words ≥ 3 chars)
+    if (norm.length >= 3) {
+      const regex = buildSpacedRegex(norm);
+      if (regex.test(normalizedText)) return word;
+    }
+  }
+
   return null;
 }
 
@@ -180,26 +99,15 @@ export interface ModerationResult {
   flaggedWords?: string[];
 }
 
+const ALL_BAD_WORDS = [...AR_BAD_WORDS, ...FR_BAD_WORDS, ...HASSANIYA_BAD_WORDS];
+
 export function moderateText(title: string, description?: string | null): ModerationResult {
-  const rawText = `${title} ${description ?? ''}`.toLowerCase();
-  const text = normalizeArabic(rawText);
+  const text = `${title} ${description ?? ''}`;
   const found: string[] = [];
 
-  // Check all word lists
-  const allLists = [
-    { words: AR_BAD_WORDS, label: 'Arabic' },
-    { words: HASSANIYA_BAD_WORDS, label: 'Hassaniya' },
-    { words: FR_BAD_WORDS, label: 'French' },
-  ];
-
-  for (const { words } of allLists) {
-    for (const word of words) {
-      const detected = detectBadWord(text, [word]);
-      if (detected && !found.includes(detected)) {
-        found.push(detected);
-      }
-    }
-  }
+  // Check combined word list
+  const flagged = detectBadWord(text, ALL_BAD_WORDS);
+  if (flagged) found.push(flagged);
 
   if (found.length > 0) {
     return {
@@ -237,20 +145,23 @@ export function validateImageFile(
   return { ok: true };
 }
 
-// ── NSFW image check (placeholder) ─────────────────────────────────────
+// ── NSFW image check ───────────────────────────────────────────────────
 /**
  * Checks a public image URL for NSFW content.
  *
- * Current implementation: pattern-based checks on the URL and file extension.
+ * Layer 1: URL pattern matching (keywords in URL)
+ * Layer 2: File extension validation
+ * Layer 3: Image content analysis via sharp
+ *   - Verifies image is a real image (not a disguised file)
+ *   - Checks for suspicious dimensions
  *
- * TODO: Integrate TensorFlow.js + nsfwjs for real image content analysis.
- *   - Load @tensorflow/tfjs and nsfwjs
- *   - Fetch image as blob, decode via createImageBitmap or canvas
- *   - Classify with nsfwjs.classify(img)
- *   - Flag if 'Porn' / 'Hentai' probability > 0.6
+ * Real NSFW content detection (porn/hentai) requires ML models:
+ * For production use, integrate:
+ *   - TensorFlow.js + nsfwjs for browser-side
+ *   - OR a serverless function with sharp + external NSFW API
+ *   - OR Cloudflare Workers with a pre-trained model
  *
  * @param imageUrl - Public URL of the uploaded image
- * @returns ModerationResult with ok: false if suspicious patterns found
  */
 export interface NSFWCheckResult {
   ok: boolean;
@@ -262,10 +173,9 @@ export async function checkImageNSFW(imageUrl: string): Promise<NSFWCheckResult>
     return { ok: false, reason: 'رابط الصورة غير صالح.' };
   }
 
-  // ── URL pattern checks ──────────────────────────────────────────────
-  // Check for NSFW-related keywords in the URL itself
+  // ── Layer 1: URL pattern checks ─────────────────────────────────────
   const nsfwUrlPattern =
-    /(porn|nsfw|xxx|sex|nude|naked|adult|erotic|hentai|gore|explicit|إباح|عري|سكس)/i;
+    /(porn|nsfw|xxx|sex|nude|naked|adult|erotic|hentai|gore|explicit|sexy|fuck| dick|pussy|boobs|tits|إباح|عري|سكس|جنس)/i;
   if (nsfwUrlPattern.test(imageUrl)) {
     return {
       ok: false,
@@ -273,36 +183,83 @@ export async function checkImageNSFW(imageUrl: string): Promise<NSFWCheckResult>
     };
   }
 
-  // ── File extension validation ───────────────────────────────────────
+  // ── Layer 2: File extension validation ──────────────────────────────
   const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.avif'];
   const urlLower = imageUrl.toLowerCase();
-  const ext = urlLower.slice(Math.max(0, urlLower.lastIndexOf('.')));
-
-  // Strip query params from extension
+  const lastDot = urlLower.lastIndexOf('.');
+  if (lastDot === -1) {
+    return { ok: false, reason: 'رابط الصورة لا يحتوي على امتداد صالح.' };
+  }
+  const ext = urlLower.slice(lastDot);
   const cleanExt = ext.split('?')[0];
 
   if (cleanExt && !allowedExts.includes(cleanExt)) {
     return {
       ok: false,
-      reason: 'صيغة الصورة غير مدعومة في الرابط.',
+      reason: 'صيغة الصورة غير مدعومة. استخدم JPG أو PNG أو WebP.',
     };
   }
 
-  // ── Placeholder for image content analysis ──────────────────────────
-  // TODO: Integrate TensorFlow.js + nsfwjs here:
-  //
-  // import * as tf from '@tensorflow/tfjs';
-  // import * as nsfwjs from 'nsfwjs';
-  //
-  // async function checkImageContent(url: string): Promise<boolean> {
-  //   const model = await nsfwjs.load();
-  //   const img = await loadImage(url);
-  //   const predictions = await model.classify(img);
-  //   const risky = predictions.find(p =>
-  //     (p.className === 'Porn' || p.className === 'Hentai') && p.probability > 0.6
-  //   );
-  //   return !!risky;
-  // }
+  // ── Layer 3: Image content validation via fetch + sharp ─────────────
+  try {
+    const response = await fetch(imageUrl, {
+      signal: AbortSignal.timeout(10000), // 10s timeout
+    });
+
+    if (!response.ok) {
+      return { ok: false, reason: 'تعذر الوصول إلى الصورة للتحقق منها.' };
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.startsWith('image/')) {
+      return {
+        ok: false,
+        reason: 'الملف ليس صورة حقيقية. تم رفضه.',
+      };
+    }
+
+    // Get file size from headers
+    const contentLength = response.headers.get('content-length');
+    if (contentLength) {
+      const size = parseInt(contentLength, 10);
+      if (size > 10 * 1024 * 1024) {
+        return { ok: false, reason: 'حجم الصورة كبير جداً. الحد الأقصى 10 ميجابايت.' };
+      }
+    }
+
+    // Use sharp to validate image content (sharp is already installed)
+    try {
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const { default: sharp } = await import('sharp');
+      const metadata = await sharp(buffer).metadata();
+
+      if (!metadata.width || !metadata.height) {
+        return { ok: false, reason: 'تعذر قراءة أبعاد الصورة.' };
+      }
+
+      // Reject suspiciously small images (likely spam/placeholder)
+      if (metadata.width < 50 || metadata.height < 50) {
+        return { ok: false, reason: 'أبعاد الصورة صغيرة جداً.' };
+      }
+
+      // Reject extremely large images (likely raw/stolen content)
+      if (metadata.width > 8000 || metadata.height > 8000) {
+        return { ok: false, reason: 'أبعاد الصورة كبيرة جداً.' };
+      }
+
+    } catch {
+      // sharp failed to decode — likely a corrupted or disguised file
+      return {
+        ok: false,
+        reason: 'الملف ليس صورة صالحة. تم رفضه.',
+      };
+    }
+  } catch {
+    // Network error or timeout — allow through (don't block legitimate uploads
+    // due to transient network issues)
+    console.warn('[checkImageNSFW] Network error fetching image for validation, allowing through');
+  }
 
   return { ok: true };
 }
