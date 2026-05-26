@@ -57,7 +57,7 @@ export default async function AdminDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {pending.slice(0, 5).map((p: any) => (
+                {pending.slice(0, 5).map((p: { id: string; title: string; price: number; currency: string; city: string | null; created_at: string }) => (
                   <tr key={p.id}>
                     <td className="admin-td-title">{p.title}</td>
                     <td>{p.price} {p.currency}</td>

@@ -3,7 +3,15 @@
 import { useState } from 'react';
 import { getAllProducts } from '../actions';
 
-type Product = any;
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  currency: string;
+  status: string;
+  city: string | null;
+  created_at: string;
+}
 
 const statusColors: Record<string, string> = {
   active: '#2ecc71',
@@ -48,7 +56,7 @@ export function ProductsClient({
             </tr>
           </thead>
           <tbody>
-            {products.map((p: any) => (
+            {products.map((p: Product) => (
               <tr key={p.id}>
                 <td className="admin-td-title">{p.title}</td>
                 <td>{p.price} {p.currency}</td>

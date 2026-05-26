@@ -3,7 +3,15 @@
 import { useState } from 'react';
 import { getStores } from '../actions';
 
-type Store = any;
+interface Store {
+  id: string;
+  name: string;
+  city: string | null;
+  products_count: number;
+  followers_count: number;
+  is_verified: boolean;
+  created_at: string;
+}
 
 export function StoresClient({
   stores: initialStores,
@@ -42,7 +50,7 @@ export function StoresClient({
             </tr>
           </thead>
           <tbody>
-            {stores.map((s: any) => (
+            {stores.map((s: Store) => (
               <tr key={s.id}>
                 <td className="admin-td-title">{s.name}</td>
                 <td>{s.city ?? '—'}</td>

@@ -3,11 +3,21 @@
 import { useState, useTransition } from 'react';
 import Image from 'next/image';
 
-type Product = any;
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  currency: string;
+  city: string | null;
+  created_at: string;
+  promotion_requested_at?: string | null;
+  promoted_until?: string | null;
+  product_images?: Array<{ url: string; sort_order: number }>;
+}
 
 function imageUrl(p: Product) {
   if (!p.product_images?.length) return null;
-  const sorted = [...p.product_images].sort((a: any, b: any) => a.sort_order - b.sort_order);
+  const sorted = [...p.product_images].sort((a, b) => a.sort_order - b.sort_order);
   return sorted[0]?.url;
 }
 

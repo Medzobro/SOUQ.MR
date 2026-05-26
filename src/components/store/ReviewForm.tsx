@@ -2,7 +2,6 @@
 
 import { useState, useActionState, useEffect, useRef } from 'react';
 import { submitReviewAction } from '@/app/[locale]/store/[id]/actions';
-import type { SubmitReviewState } from '@/app/[locale]/store/[id]/actions';
 
 type Props = {
   storeId: string;

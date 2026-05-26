@@ -4,6 +4,7 @@ import { cast } from '@/lib/supabase/helpers';
 import { firstImageUrl } from '@/lib/queries';
 import ProductCard from '@/components/products/ProductCard';
 import SearchBar from '@/components/search/SearchBar';
+import SearchLoadMore from '@/components/search/SearchLoadMore';
 import { categoryName } from '@/lib/categories';
 import type { Product, ProductImage } from '@/lib/supabase/database.types';
 import type { AppLocale } from '@/i18n/routing';
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 interface SearchPageProps {
   params: Promise<{ locale: AppLocale }>;
-  searchParams: Promise<{ q?: string; category?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; cursor?: string }>;
 }
 
 type ProductWithImages = Pick<
@@ -30,9 +31,11 @@ type CategoryRow = {
   icon: string | null;
 };
 
+const PAGE_SIZE = 20;
+
 export default async function SearchPage({ params, searchParams }: SearchPageProps) {
   const { locale } = await params;
-  const { q, category: categorySlug } = await searchParams;
+  const { q, category: categorySlug, cursor } = await searchParams;
   setRequestLocale(locale);
 
   const t = await getTranslations('home');
@@ -60,15 +63,27 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
     )
     .eq('status', 'active')
     .order('created_at', { ascending: false })
-    .limit(60);
+    .limit(PAGE_SIZE + 1); // +1 to detect hasMore
 
   if (categoryId) query = query.eq('category_id', categoryId);
   if (q && q.trim().length > 0) {
     query = query.ilike('title', `%${q.trim()}%`);
   }
+  if (cursor) {
+    query = query.lt('created_at', cursor);
+  }
 
   const { data } = await query;
-  const list = cast<ProductWithImages[]>(data ?? []);
+  const raw = cast<ProductWithImages[]>(data ?? []);
+  const hasMore = raw.length > PAGE_SIZE;
+  const list = hasMore ? raw.slice(0, PAGE_SIZE) : raw;
+  const nextCursor = hasMore ? (list[list.length - 1]?.created_at ?? null) : null;
+
+  // Build cursor search params for the load-more link
+  const nextSearchParams = new URLSearchParams();
+  if (q?.trim()) nextSearchParams.set('q', q.trim());
+  if (categorySlug) nextSearchParams.set('category', categorySlug);
+  if (nextCursor) nextSearchParams.set('cursor', nextCursor);
 
   return (
     <div style={{ paddingBottom: 80, paddingTop: 70 }}>
@@ -80,7 +95,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
             {categoryRow
               ? `${categoryRow.icon ?? ''} ${categoryName(categoryRow, locale)}`
               : q
-                ? `“${q}”`
+                ? `"${q}"`
                 : t('latestListings')}
             <span style={{ marginInlineStart: 8, color: 'var(--color-text-muted)', fontSize: 14 }}>
               {list.length}
@@ -94,24 +109,34 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
             <p>{t('noProducts')}</p>
           </div>
         ) : (
-          <div className="products-grid">
-            {list.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={{
-                  id: p.id,
-                  title: p.title,
-                  price: p.price,
-                  currency: p.currency,
-                  city: p.city,
-                  badge: p.badge,
-                  imageUrl: firstImageUrl(p),
-                }}
-                locale={locale}
-                contactLabel={t('contact')}
-              />
-            ))}
-          </div>
+          <>
+            <div className="products-grid">
+              {list.map((p) => (
+                <ProductCard
+                  key={p.id}
+                  product={{
+                    id: p.id,
+                    title: p.title,
+                    price: p.price,
+                    currency: p.currency,
+                    city: p.city,
+                    badge: p.badge,
+                    imageUrl: firstImageUrl(p),
+                  }}
+                  locale={locale}
+                  contactLabel={t('contact')}
+                />
+              ))}
+            </div>
+            {nextCursor && (
+              <div style={{ textAlign: 'center', marginTop: 24, marginBottom: 8 }}>
+                <SearchLoadMore
+                  searchParams={nextSearchParams.toString()}
+                  label={locale === 'ar' ? 'تحميل المزيد' : locale === 'fr' ? 'Charger plus' : 'Load more'}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

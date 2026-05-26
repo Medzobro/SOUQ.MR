@@ -129,6 +129,8 @@ export async function createProductAction(
     if (imgErr) console.error('[createProductImages]', imgErr);
   }
 
-  revalidatePath('/');
+  for (const locale of ['/ar', '/fr', '/en']) {
+    revalidatePath(`${locale}/`);
+  }
   redirect(`/ar/product/${created.id}`);
 }

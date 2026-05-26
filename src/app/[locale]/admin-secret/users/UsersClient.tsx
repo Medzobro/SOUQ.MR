@@ -3,7 +3,14 @@
 import { useState, useTransition } from 'react';
 import { getUsers } from '../actions';
 
-type User = any;
+interface User {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  role: string;
+  city: string | null;
+  created_at: string;
+}
 
 export function UsersClient({
   users: initialUsers,
@@ -55,7 +62,7 @@ export function UsersClient({
             </tr>
           </thead>
           <tbody>
-            {users.map((u: any) => (
+            {users.map((u: User) => (
               <tr key={u.id}>
                 <td className="admin-td-title">{u.full_name ?? '—'}</td>
                 <td dir="ltr">{u.phone ?? '—'}</td>

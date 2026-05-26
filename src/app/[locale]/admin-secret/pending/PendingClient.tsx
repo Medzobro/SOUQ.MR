@@ -2,9 +2,18 @@
 
 import { useState, useTransition } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 
-type Product = any;
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  currency: string;
+  city: string | null;
+  description: string | null;
+  status: string;
+  created_at: string;
+  product_images?: Array<{ url: string; sort_order: number }>;
+}
 
 export function PendingClient({
   products,
@@ -33,7 +42,7 @@ export function PendingClient({
 
   function imageUrl(p: Product) {
     if (!p.product_images?.length) return null;
-    const sorted = [...p.product_images].sort((a: any, b: any) => a.sort_order - b.sort_order);
+    const sorted = [...p.product_images].sort((a, b) => a.sort_order - b.sort_order);
     return sorted[0]?.url;
   }
 

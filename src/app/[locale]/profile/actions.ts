@@ -100,7 +100,9 @@ export async function upsertStoreAction(
     if (error) return { ok: false, error: error.message };
   }
 
-  revalidatePath('/profile');
+  for (const locale of ['/ar', '/fr', '/en']) {
+    revalidatePath(`${locale}/profile`);
+  }
   redirect('/profile');
 }
 
