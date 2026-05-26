@@ -109,9 +109,11 @@ export async function middleware(request: NextRequest) {
   // ── Locale redirect ──────────────────────────────────────────────────
   // Redirect locale-less paths to default locale prefix
   // e.g. /search → /ar/search, /sell → /ar/sell
+  // Skip API routes, auth callbacks, and static files
   const validLocales = ['ar', 'fr', 'en'];
   const firstSegment = pathname.split('/')[1];
-  if (firstSegment && !validLocales.includes(firstSegment) && pathname !== '/') {
+  const skipLocalePrefix = ['api', 'auth', '_next', '_vercel', 'favicon.ico', 'robots.txt', 'sitemap.xml', 'manifest.json'];
+  if (firstSegment && !validLocales.includes(firstSegment) && pathname !== '/' && !skipLocalePrefix.includes(firstSegment)) {
     const locale = request.cookies.get('NEXT_LOCALE')?.value || 'ar';
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}${pathname}`;
