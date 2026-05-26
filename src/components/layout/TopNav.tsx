@@ -29,7 +29,7 @@ export default function TopNav() {
     };
   }, []);
 
-  if (pathname.startsWith('/auth')) return null;
+  if (pathname.includes('/auth') || pathname.includes('/admin-secret')) return null;
 
   return (
     <nav className="nav">

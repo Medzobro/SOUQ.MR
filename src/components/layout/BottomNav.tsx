@@ -18,13 +18,16 @@ const ITEMS: Array<{ key: 'home' | 'search' | 'messages' | 'profile'; href: stri
 export default function BottomNav() {
   const t = useTranslations('nav');
   const pathname = usePathname();
-  const isAuth = pathname.startsWith('/auth');
+  const isAuth = pathname.includes('/auth');
+  const isAdmin = pathname.includes('/admin-secret');
 
-  if (isAuth) return null;
+  if (isAuth || isAdmin) return null;
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
-    return pathname.startsWith(href);
+    // Match pathname against href considering locale prefix
+    // pathname is like /ar/search, href is like /search
+    if (href === '/') return pathname === '/' || pathname === '/ar';
+    return pathname.endsWith(href) || pathname.includes(href + '/');
   };
 
   return (
