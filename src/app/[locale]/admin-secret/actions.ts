@@ -75,9 +75,9 @@ export async function getPendingProducts() {
 
 export async function approveProduct(productId: string) {
   const supabase = await createClient();
-  const { error } = await supabase
-    .from('products')
-    .update({ status: 'active' })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from('products') as any)
+    .update({ status: 'active' } as any)
     .eq('id', productId);
   if (error) return { ok: false, error: error.message };
   revalidatePath('/ar/admin-secret');
@@ -88,9 +88,9 @@ export async function approveProduct(productId: string) {
 
 export async function rejectProduct(productId: string) {
   const supabase = await createClient();
-  const { error } = await supabase
-    .from('products')
-    .update({ status: 'hidden' })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from('products') as any)
+    .update({ status: 'hidden' } as any)
     .eq('id', productId);
   if (error) return { ok: false, error: error.message };
   revalidatePath('/ar/admin-secret');
@@ -101,8 +101,8 @@ export async function rejectProduct(productId: string) {
 
 export async function deleteProduct(productId: string) {
   const supabase = await createClient();
-  const { error } = await supabase
-    .from('products')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from('products') as any)
     .delete()
     .eq('id', productId);
   if (error) return { ok: false, error: error.message };
@@ -116,9 +116,9 @@ export async function deleteProduct(productId: string) {
 
 export async function makeAdmin(userId: string) {
   const supabase = await createClient();
-  const { error } = await supabase
-    .from('profiles')
-    .update({ role: 'admin' })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from('profiles') as any)
+    .update({ role: 'admin' } as any)
     .eq('id', userId);
   if (error) return { ok: false, error: error.message };
   revalidatePath('/ar/admin-secret/users');
