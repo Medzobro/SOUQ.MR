@@ -6,14 +6,20 @@ import { createClient } from '@/lib/supabase/server';
  * DELETE this file after running!
  * Usage: GET /api/migrate (must be admin)
  */
-export async function GET() {
+export async function GET(req: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'auth' }, { status: 401 });
 
-  const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((data as any)?.role !== 'admin') return NextResponse.json({ error: 'admin' }, { status: 403 });
+  // Allow both admin auth and secret key
+  const secret = new URL(req.url).searchParams.get('secret');
+  const isSecretValid = secret && secret === process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!isSecretValid) {
+    if (!user) return NextResponse.json({ error: 'auth' }, { status: 401 });
+    const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((data as any)?.role !== 'admin') return NextResponse.json({ error: 'admin' }, { status: 403 });
+  }
 
   // Read service role key from env
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
