@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Image from 'next/image';
 import {
   getMyProducts,
   deleteMyProduct,
@@ -93,12 +94,12 @@ export function MyProducts() {
                 }}
               >
                 {img && (
-                  <img
+                  <Image
                     src={img}
                     alt={p.title}
+                    width={70}
+                    height={70}
                     style={{
-                      width: 70,
-                      height: 70,
                       borderRadius: 8,
                       objectFit: 'cover',
                       flexShrink: 0,
@@ -149,7 +150,7 @@ export function MyProducts() {
                       <button
                         className="admin-btn admin-btn--approve"
                         style={{ fontSize: 11, padding: '5px 10px' }}
-                        onClick={() => handle('sold', p.id)}
+                        onClick={() => { if (!confirm('هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.')) return; handle('sold', p.id); }}
                         disabled={pending}
                       >
                         ✅ مباع
@@ -169,7 +170,7 @@ export function MyProducts() {
                   <button
                     className="admin-btn admin-btn--delete"
                     style={{ fontSize: 11, padding: '5px 10px' }}
-                    onClick={() => handle('delete', p.id)}
+                    onClick={() => { if (!confirm('هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.')) return; handle('delete', p.id); }}
                     disabled={pending}
                   >
                     🗑️

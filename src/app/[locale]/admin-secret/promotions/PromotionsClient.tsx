@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Image from 'next/image';
 
 type Product = any;
 
@@ -57,7 +58,7 @@ export function PromotionsClient({
                 <div key={p.id} className="admin-product-card">
                   {img && (
                     <div className="admin-product-img">
-                      <img src={img} alt={p.title} />
+                      <Image src={img} alt={p.title} fill sizes="300px" />
                     </div>
                   )}
                   <div className="admin-product-body">
@@ -98,7 +99,7 @@ export function PromotionsClient({
                       </button>
                       <button
                         className="admin-btn admin-btn--reject"
-                        onClick={() => handle('reject', p.id)}
+                        onClick={() => { if (!confirm('هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.')) return; handle('reject', p.id); }}
                         disabled={pending}
                       >
                         ❌ رفض
@@ -140,7 +141,7 @@ export function PromotionsClient({
                       <button
                         className="admin-btn admin-btn--reject"
                         style={{ fontSize: 11, padding: '4px 10px' }}
-                        onClick={() => handle('revoke', p.id)}
+                        onClick={() => { if (!confirm('هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.')) return; handle('revoke', p.id); }}
                         disabled={pending}
                       >
                         ❌ إلغاء

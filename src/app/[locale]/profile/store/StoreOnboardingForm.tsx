@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import ImageUploader from '@/components/upload/ImageUploader';
 import { upsertStoreAction, type StoreFormState } from '../actions';
@@ -170,8 +171,7 @@ export default function StoreOnboardingForm({ userId, store, cities }: Props) {
             fontSize: 32, flexShrink: 0, overflow: 'hidden',
           }}>
             {avatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={avatar} alt="Avatar preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Image src={avatar} alt="Avatar preview" fill sizes="80px" style={{ objectFit: 'cover' }} />
             ) : (
               <span style={{ fontSize: 28, opacity: 0.4 }}>🏪</span>
             )}

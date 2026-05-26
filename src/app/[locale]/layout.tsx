@@ -36,24 +36,33 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'common' });
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const appName = t('appName');
+  const tagline = t('tagline');
 
   return {
     title: {
-      default: `${t('appName')} — ${t('tagline')}`,
-      template: `%s · ${t('appName')}`,
+      default: `${appName} — ${tagline}`,
+      template: `%s · ${appName}`,
     },
-    description: t('tagline'),
-    metadataBase: process.env.NEXT_PUBLIC_SITE_URL
-      ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
-      : undefined,
+    description: tagline,
+    metadataBase: new URL(siteUrl),
     icons: {
       icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
     },
     openGraph: {
-      title: `${t('appName')} — ${t('tagline')}`,
-      description: t('tagline'),
+      title: `${appName} — ${tagline}`,
+      description: tagline,
       type: 'website',
       locale,
+      siteName: appName,
+    },
+    alternates: {
+      languages: {
+        ar: `${siteUrl}/ar`,
+        fr: `${siteUrl}/fr`,
+        en: `${siteUrl}/en`,
+      },
     },
   };
 }

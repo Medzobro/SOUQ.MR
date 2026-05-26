@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useTransition, type FormEvent } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { createClient } from '@/lib/supabase/client';
@@ -125,11 +126,12 @@ export default function ChatRoom({
         </button>
         <div className="chat-avatar" style={{ width: 38, height: 38 }}>
           {peer.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={peer.avatar_url}
               alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 14 }}
+              fill
+              sizes="38px"
+              style={{ objectFit: 'cover', borderRadius: 14 }}
             />
           ) : (
             '👤'

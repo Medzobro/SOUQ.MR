@@ -179,6 +179,8 @@ export type Database = {
           status?: ProductStatus;
           badge?: string | null;
           is_negotiable?: boolean;
+          is_promoted?: boolean;
+          promotion_requested?: boolean;
         };
         Update: {
           store_id?: string | null;
@@ -194,6 +196,10 @@ export type Database = {
           badge?: string | null;
           is_negotiable?: boolean;
           views_count?: number;
+          is_promoted?: boolean;
+          promoted_until?: string | null;
+          promotion_requested?: boolean;
+          promotion_requested_at?: string | null;
         };
         Relationships: [];
       };

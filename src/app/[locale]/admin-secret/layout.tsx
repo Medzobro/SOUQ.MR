@@ -19,15 +19,13 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     .eq('id', user.id)
     .single();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const p = profile as any;
-  if (p?.role !== 'admin') {
+  if (!profile || profile.role !== 'admin') {
     redirect('/ar');
   }
 
   return (
     <div className="admin-layout">
-      <AdminSidebar userName={p?.full_name ?? 'المشرف'} />
+      <AdminSidebar userName={profile.full_name ?? 'المشرف'} />
       <main className="admin-main">{children}</main>
     </div>
   );

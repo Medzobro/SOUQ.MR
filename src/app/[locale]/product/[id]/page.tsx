@@ -1,4 +1,6 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
+import Image from 'next/image';
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { createClient } from '@/lib/supabase/server';
@@ -12,6 +14,47 @@ import type { ProductCondition } from '@/lib/supabase/database.types';
 import type { AppLocale } from '@/i18n/routing';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: AppLocale; id: string }>;
+}): Promise<Metadata> {
+  const { locale, id } = await params;
+  const supabase = await createClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+  const { data } = await supabase
+    .from('products')
+    .select('title, description, price, currency, images:product_images(url, sort_order)')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (!data) return { title: 'Product Not Found' };
+
+  const product = cast<{ title: string; description: string | null; price: number; currency: string; images: Array<{ url: string; sort_order: number }> }>(data);
+  const firstImage = product.images?.sort((a, b) => a.sort_order - b.sort_order)[0]?.url;
+  const description = product.description?.slice(0, 160) ?? `${product.price} ${product.currency}`;
+
+  return {
+    title: product.title,
+    description,
+    openGraph: {
+      title: product.title,
+      description,
+      type: 'article',
+      locale,
+      ...(firstImage ? { images: [{ url: firstImage, width: 800, height: 600 }] } : {}),
+    },
+    alternates: {
+      languages: {
+        ar: `${siteUrl}/ar/product/${id}`,
+        fr: `${siteUrl}/fr/product/${id}`,
+        en: `${siteUrl}/en/product/${id}`,
+      },
+    },
+  };
+}
 
 interface ProductRow {
   id: string;
@@ -84,12 +127,9 @@ export default async function ProductDetailPage({
   const product = cast<ProductRow | null>(data);
   if (error || !product) notFound();
 
-  // increment views_count (fire-and-forget)
-  void supabase
-    .from('products')
-    .update({ views_count: (product.views_count ?? 0) + 1 } as never)
-    .eq('id', product.id)
-    .then(() => undefined);
+  // increment views_count atomically via RPC (no read-before-write race)
+  // @ts-expect-error - increment_views RPC not yet in generated Database types
+  void supabase.rpc('increment_views', { product_id: product.id }).then(() => undefined);
 
   const {
     data: { user },
@@ -189,8 +229,7 @@ export default async function ProductDetailPage({
           <Link href={`/store/${product.store.id}`} className="seller-mini">
             <div className="seller-mini-avatar">
               {product.store.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={product.store.avatar_url} alt={sellerName} />
+                <Image src={product.store.avatar_url} alt={sellerName} fill sizes="40px" />
               ) : (
                 '🏪'
               )}
@@ -208,8 +247,7 @@ export default async function ProductDetailPage({
           <div className="seller-mini">
             <div className="seller-mini-avatar">
               {product.seller?.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={product.seller.avatar_url} alt={sellerName} />
+                <Image src={product.seller.avatar_url} alt={sellerName} fill sizes="40px" />
               ) : (
                 '👤'
               )}

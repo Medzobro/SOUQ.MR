@@ -2,6 +2,19 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { checkAdmin } from '@/lib/supabase/admin-auth';
+
+// ── Revalidation helper (all locales) ─────────────────────────────────
+
+const ALL_LOCALES = ['/ar', '/fr', '/en'];
+
+function revalidateAdmin(...paths: string[]) {
+  for (const locale of ALL_LOCALES) {
+    for (const p of paths) {
+      revalidatePath(`${locale}${p}`);
+    }
+  }
+}
 
 // ── Get promotion requests ────────────────────────────────────────────
 
@@ -28,57 +41,64 @@ export async function getPromotedProducts() {
   return data ?? [];
 }
 
-// ── Approve promotion (7 days default) ────────────────────────────────
+// ── Approve promotion (7 days default) — ADMIN ONLY ──────────────────
 
 export async function approvePromotion(productId: string, days: number = 7) {
+  const auth = await checkAdmin();
+  if (!auth.ok) return auth;
+
   const supabase = await createClient();
   const until = new Date();
   until.setDate(until.getDate() + days);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from('products') as any)
+  const { error } = await supabase
+    .from('products')
     .update({
       is_promoted: true,
       promotion_requested: false,
       promoted_until: until.toISOString(),
-    } as any)
+    })
     .eq('id', productId);
 
   if (error) return { ok: false, error: error.message };
-  revalidatePath('/ar/admin-secret/promotions');
-  revalidatePath('/ar');
+  revalidateAdmin('/admin-secret/promotions');
   return { ok: true };
 }
 
-// ── Revoke promotion ──────────────────────────────────────────────────
+// ── Revoke promotion — ADMIN ONLY ────────────────────────────────────
 
 export async function revokePromotion(productId: string) {
+  const auth = await checkAdmin();
+  if (!auth.ok) return auth;
+
   const supabase = await createClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from('products') as any)
+  const { error } = await supabase
+    .from('products')
     .update({
       is_promoted: false,
       promoted_until: null,
       promotion_requested: false,
-    } as any)
+    })
     .eq('id', productId);
 
   if (error) return { ok: false, error: error.message };
-  revalidatePath('/ar/admin-secret/promotions');
-  revalidatePath('/ar');
+  revalidateAdmin('/admin-secret/promotions');
   return { ok: true };
 }
 
-// ── Reject promotion request ──────────────────────────────────────────
+// ── Reject promotion request — ADMIN ONLY ────────────────────────────
 
 export async function rejectPromotionRequest(productId: string) {
+  const auth = await checkAdmin();
+  if (!auth.ok) return auth;
+
   const supabase = await createClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from('products') as any)
-    .update({ promotion_requested: false } as any)
+  const { error } = await supabase
+    .from('products')
+    .update({ promotion_requested: false })
     .eq('id', productId);
 
   if (error) return { ok: false, error: error.message };
-  revalidatePath('/ar/admin-secret/promotions');
+  revalidateAdmin('/admin-secret/promotions');
   return { ok: true };
 }

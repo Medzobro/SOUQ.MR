@@ -1,4 +1,5 @@
 import { Link } from '@/i18n/routing';
+import Image from 'next/image';
 import { formatPrice } from '@/lib/format';
 import type { AppLocale } from '@/i18n/routing';
 import FavoriteButton from './FavoriteButton';
@@ -33,8 +34,7 @@ export default function ProductCard({
     <Link href={`/product/${product.id}`} className="product-card">
       <div className="product-img">
         {product.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={product.imageUrl} alt={product.title} loading="lazy" />
+          <Image src={product.imageUrl} alt={product.title} fill sizes="(max-width: 768px) 50vw, 25vw" />
         ) : (
           <span aria-hidden>{product.imageEmoji ?? '📦'}</span>
         )}

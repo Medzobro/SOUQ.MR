@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { cast } from '@/lib/supabase/helpers';
@@ -201,8 +202,7 @@ export default async function StorePage({
     <div style={{ paddingBottom: 80, paddingTop: 60 }}>
       <div className="store-cover">
         {store.cover_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={store.cover_url} alt={store.name} />
+          <Image src={store.cover_url} alt={store.name} fill sizes="100vw" priority />
         ) : (
           <span aria-hidden>🏪</span>
         )}
@@ -212,8 +212,7 @@ export default async function StorePage({
       <div className="store-profile">
         <div className="store-avatar">
           {store.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={store.avatar_url} alt={store.name} />
+            <Image src={store.avatar_url} alt={store.name} fill sizes="80px" />
           ) : (
             '🏪'
           )}

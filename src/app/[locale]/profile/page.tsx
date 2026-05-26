@@ -1,4 +1,5 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 import { redirect, Link } from '@/i18n/routing';
 import { createClient } from '@/lib/supabase/server';
 import { cast } from '@/lib/supabase/helpers';
@@ -80,8 +81,7 @@ export default async function ProfilePage({
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
           <div className="store-avatar" style={{ width: 70, height: 70, borderRadius: 18 }}>
             {profile?.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={profile.avatar_url} alt="" />
+              <Image src={profile.avatar_url} alt="" fill sizes="70px" />
             ) : (
               '👤'
             )}
@@ -104,8 +104,7 @@ export default async function ProfilePage({
           <Link href={`/store/${store.id}`} className="seller-mini" style={{ marginBottom: 0 }}>
             <div className="seller-mini-avatar">
               {store.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={store.avatar_url} alt="" />
+                <Image src={store.avatar_url} alt="" fill sizes="40px" />
               ) : (
                 '🏪'
               )}

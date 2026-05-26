@@ -4,6 +4,16 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { moderateText } from '@/lib/moderation';
 
+const ALL_LOCALES = ['/ar', '/fr', '/en'];
+
+function revalidateAll(...paths: string[]) {
+  for (const locale of ALL_LOCALES) {
+    for (const p of paths) {
+      revalidatePath(`${locale}${p}`);
+    }
+  }
+}
+
 // ── Get user's products ───────────────────────────────────────────────
 
 export async function getMyProducts() {
@@ -34,15 +44,14 @@ export async function deleteMyProduct(productId: string) {
     .eq('id', productId)
     .single();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!product || (product as any).seller_id !== user.id) {
+  if (!product || product.seller_id !== user.id) {
     return { ok: false, error: 'غير مصرح بحذف هذا المنتج' };
   }
 
   const { error } = await supabase.from('products').delete().eq('id', productId);
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath('/ar/profile');
+  revalidateAll('/profile');
   return { ok: true };
 }
 
@@ -59,18 +68,17 @@ export async function markAsSold(productId: string) {
     .eq('id', productId)
     .single();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!product || (product as any).seller_id !== user.id) {
+  if (!product || product.seller_id !== user.id) {
     return { ok: false, error: 'غير مصرح' };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from('products') as any)
-    .update({ status: 'sold', is_promoted: false } as any)
+  const { error } = await supabase
+    .from('products')
+    .update({ status: 'sold', is_promoted: false })
     .eq('id', productId);
 
   if (error) return { ok: false, error: error.message };
-  revalidatePath('/ar/profile');
+  revalidateAll('/profile');
   return { ok: true };
 }
 
@@ -87,19 +95,17 @@ export async function requestPromotion(productId: string) {
     .eq('id', productId)
     .single();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const p = product as any;
-  if (!p || p.seller_id !== user.id) return { ok: false, error: 'غير مصرح' };
-  if (p.status !== 'active') return { ok: false, error: 'يمكن ترويج المنتجات النشطة فقط' };
-  if (p.promotion_requested || p.is_promoted) return { ok: false, error: 'تم طلب الترويج مسبقاً' };
+  if (!product || product.seller_id !== user.id) return { ok: false, error: 'غير مصرح' };
+  if (product.status !== 'active') return { ok: false, error: 'يمكن ترويج المنتجات النشطة فقط' };
+  if (product.promotion_requested || product.is_promoted) return { ok: false, error: 'تم طلب الترويج مسبقاً' };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from('products') as any)
-    .update({ promotion_requested: true, promotion_requested_at: new Date().toISOString() } as any)
+  const { error } = await supabase
+    .from('products')
+    .update({ promotion_requested: true, promotion_requested_at: new Date().toISOString() })
     .eq('id', productId);
 
   if (error) return { ok: false, error: error.message };
-  revalidatePath('/ar/profile');
+  revalidateAll('/profile');
   return { ok: true };
 }
 

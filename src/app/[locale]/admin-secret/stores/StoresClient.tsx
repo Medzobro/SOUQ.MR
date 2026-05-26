@@ -1,8 +1,29 @@
 'use client';
 
+import { useState } from 'react';
+import { getStores } from '../actions';
+
 type Store = any;
 
-export function StoresClient({ stores }: { stores: Store[] }) {
+export function StoresClient({
+  stores: initialStores,
+  nextCursor: initialCursor,
+}: {
+  stores: Store[];
+  nextCursor: string | null;
+}) {
+  const [stores, setStores] = useState<Store[]>(initialStores);
+  const [cursor, setCursor] = useState<string | null>(initialCursor);
+  const [loading, setLoading] = useState(false);
+
+  async function loadMore() {
+    setLoading(true);
+    const result = await getStores({ cursor: cursor ?? undefined });
+    setStores((prev) => [...prev, ...result.data]);
+    setCursor(result.nextCursor);
+    setLoading(false);
+  }
+
   return (
     <div className="admin-page">
       <h1 className="admin-page-title">🏪 المتاجر</h1>
@@ -34,6 +55,19 @@ export function StoresClient({ stores }: { stores: Store[] }) {
           </tbody>
         </table>
       </div>
+
+      {cursor && (
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <button
+            className="admin-btn-small"
+            onClick={loadMore}
+            disabled={loading}
+            style={{ padding: '10px 32px', fontSize: 14 }}
+          >
+            {loading ? '⏳ جاري التحميل...' : '📥 تحميل المزيد'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

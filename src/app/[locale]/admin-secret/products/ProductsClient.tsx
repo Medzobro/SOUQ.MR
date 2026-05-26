@@ -1,5 +1,8 @@
 'use client';
 
+import { useState } from 'react';
+import { getAllProducts } from '../actions';
+
 type Product = any;
 
 const statusColors: Record<string, string> = {
@@ -9,7 +12,25 @@ const statusColors: Record<string, string> = {
   hidden: '#e74c3c',
 };
 
-export function ProductsClient({ products }: { products: Product[] }) {
+export function ProductsClient({
+  products: initialProducts,
+  nextCursor: initialCursor,
+}: {
+  products: Product[];
+  nextCursor: string | null;
+}) {
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [cursor, setCursor] = useState<string | null>(initialCursor);
+  const [loading, setLoading] = useState(false);
+
+  async function loadMore() {
+    setLoading(true);
+    const result = await getAllProducts({ cursor: cursor ?? undefined });
+    setProducts((prev) => [...prev, ...result.data]);
+    setCursor(result.nextCursor);
+    setLoading(false);
+  }
+
   return (
     <div className="admin-page">
       <h1 className="admin-page-title">📦 كل المنتجات</h1>
@@ -46,6 +67,19 @@ export function ProductsClient({ products }: { products: Product[] }) {
           </tbody>
         </table>
       </div>
+
+      {cursor && (
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <button
+            className="admin-btn-small"
+            onClick={loadMore}
+            disabled={loading}
+            style={{ padding: '10px 32px', fontSize: 14 }}
+          >
+            {loading ? '⏳ جاري التحميل...' : '📥 تحميل المزيد'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

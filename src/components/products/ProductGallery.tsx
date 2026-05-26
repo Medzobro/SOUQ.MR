@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from '@/i18n/routing';
 
 interface Props {
@@ -18,8 +19,7 @@ export default function ProductGallery({ images, emojiFallback = '📦', title }
   return (
     <div className="product-gallery">
       {current ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={current} alt={title} />
+        <Image src={current} alt={title} fill sizes="100vw" priority />
       ) : (
         <span aria-hidden style={{ fontSize: 100 }}>
           {emojiFallback}

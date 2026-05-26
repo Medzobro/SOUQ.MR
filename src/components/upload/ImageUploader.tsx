@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 
@@ -119,8 +120,7 @@ export default function ImageUploader({
         <div className="upload-previews">
           {items.map((img) => (
             <div className="upload-preview" key={img.path}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url} alt="" />
+              <Image src={img.url} alt="" fill sizes="100px" />
               <button
                 type="button"
                 className="upload-preview-remove"

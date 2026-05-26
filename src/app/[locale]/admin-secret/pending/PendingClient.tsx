@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type Product = any;
@@ -52,7 +53,7 @@ export function PendingClient({
               <div key={p.id} className="admin-product-card">
                 {img && (
                   <div className="admin-product-img">
-                    <img src={img} alt={p.title} />
+                    <Image src={img} alt={p.title} fill sizes="300px" />
                   </div>
                 )}
                 <div className="admin-product-body">
@@ -80,7 +81,7 @@ export function PendingClient({
                     </button>
                     <button
                       className="admin-btn admin-btn--delete"
-                      onClick={() => handle(p.id, 'delete')}
+                      onClick={() => { if (!confirm('هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.')) return; handle(p.id, 'delete'); }}
                       disabled={pending}
                     >
                       🗑️ حذف

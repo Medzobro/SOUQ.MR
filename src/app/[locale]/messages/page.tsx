@@ -1,4 +1,5 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 import { redirect, Link } from '@/i18n/routing';
 import { createClient } from '@/lib/supabase/server';
 import { cast } from '@/lib/supabase/helpers';
@@ -76,11 +77,12 @@ export default async function MessagesListPage({
               <Link key={c.id} href={`/messages/${c.id}`} className="chat-row">
                 <div className="chat-avatar">
                   {peer?.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={peer.avatar_url}
                       alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 14 }}
+                      fill
+                      sizes="48px"
+                      style={{ objectFit: 'cover', borderRadius: 14 }}
                     />
                   ) : (
                     '👤'

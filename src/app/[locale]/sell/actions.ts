@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { cast } from '@/lib/supabase/helpers';
 
-import { moderateText } from '@/lib/moderation';
+import { moderateText, checkImageNSFW } from '@/lib/moderation';
 
 const imageSchema = z.object({
   url: z.string().url(),
@@ -72,6 +72,16 @@ export async function createProductAction(
   const modResult = moderateText(parsed.data.title, parsed.data.description);
   if (!modResult.ok) {
     return { ok: false, error: 'content_blocked' };
+  }
+
+  // NSFW image check (scan uploaded image URLs)
+  if (parsed.data.images.length > 0) {
+    for (const img of parsed.data.images) {
+      const nsfwResult = await checkImageNSFW(img.url);
+      if (!nsfwResult.ok) {
+        return { ok: false, error: 'image_blocked' };
+      }
+    }
   }
 
   // Find owner store (sellers should have one already)

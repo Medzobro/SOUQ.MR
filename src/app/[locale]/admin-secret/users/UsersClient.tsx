@@ -1,18 +1,32 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { getUsers } from '../actions';
 
 type User = any;
 
 export function UsersClient({
-  users,
+  users: initialUsers,
+  nextCursor: initialCursor,
   makeAdmin,
 }: {
   users: User[];
+  nextCursor: string | null;
   makeAdmin: (id: string) => Promise<{ ok: boolean; error?: string }>;
 }) {
+  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [cursor, setCursor] = useState<string | null>(initialCursor);
+  const [loading, setLoading] = useState(false);
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState('');
+
+  async function loadMore() {
+    setLoading(true);
+    const result = await getUsers({ cursor: cursor ?? undefined });
+    setUsers((prev) => [...prev, ...result.data]);
+    setCursor(result.nextCursor);
+    setLoading(false);
+  }
 
   async function handleMakeAdmin(userId: string) {
     start(async () => {
@@ -68,6 +82,19 @@ export function UsersClient({
           </tbody>
         </table>
       </div>
+
+      {cursor && (
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <button
+            className="admin-btn-small"
+            onClick={loadMore}
+            disabled={loading}
+            style={{ padding: '10px 32px', fontSize: 14 }}
+          >
+            {loading ? '⏳ جاري التحميل...' : '📥 تحميل المزيد'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
