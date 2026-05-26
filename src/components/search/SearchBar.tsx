@@ -27,7 +27,7 @@ export default function SearchBar() {
           aria-label={t('searchPlaceholder')}
         />
         <button type="submit" className="filter-btn" aria-label={t('search')}>
-          🔍 {t('search')}
+          {t('search')}
         </button>
       </div>
     </form>
