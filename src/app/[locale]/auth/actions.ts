@@ -48,7 +48,9 @@ export async function signInAction(_prev: AuthState | null, formData: FormData):
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from('profiles').update({ role: 'admin' }).eq('id', user.id);
+        // Use any cast to bypass Supabase type-chain regression
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any).from('profiles').update({ role: 'admin' }).eq('id', user.id);
       }
     } catch {
       // Non-critical — profile will be fixed on next login if this fails
